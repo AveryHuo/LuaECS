@@ -1,22 +1,5 @@
 local ComponentSystemInjection = {}
 
-local function Split(szFullString, szSeparator, start_pos)
-	local nFindStartIndex = start_pos or 1
-	local nSplitIndex = 1
-	local nSplitArray = {}
-	while true do
-	    local nFindLastIndex = string.find(szFullString, szSeparator, nFindStartIndex)
-	    if not nFindLastIndex then
-	    	nSplitArray[nSplitIndex] = string.sub(szFullString, nFindStartIndex, string.len(szFullString))
-	    	break
-	   	end
-	    table.insert(nSplitArray, string.sub(szFullString, nFindStartIndex, nFindLastIndex - 1))
-	    nFindStartIndex = nFindLastIndex + string.len(szSeparator)
-	    nSplitIndex = nSplitIndex + 1
-	end
-	return nSplitArray
-end
-
 local IsFindInStrList = function ( str_list, find_str )
 	if not str_list then return false end
 	
