@@ -1,4 +1,4 @@
-package.path = package.path ..'?/?.lua;../?.lua;../../?.lua;Tests/?.lua';
+package.path = '?/?.lua;../?.lua;../../?.lua;Tests/?.lua;'.. package.path;
 local ECS = require "ECS"
 lu = require('Common.luaunit')
 
@@ -29,7 +29,7 @@ function PrintTable( tbl, level, return_counter )
 	return_counter = return_counter or 5 --剩下多少层就返回,防止无限打印
 	if return_counter <= 0 then
 		-- print('Cat:util.lua PrintTable return_counter empty')
-		return 
+		return
 	end
 	return_counter = return_counter - 1
 	level = level or 1
@@ -48,8 +48,8 @@ function PrintTable( tbl, level, return_counter )
 		end
 	end
 	print(indent_str .. "}")
-	
 end
+
 -- local s = io.popen("ls ./Tests")--for linux
 local s = io.popen("dir /b Tests")--for windows
 local fileNames = s:read("*all")
@@ -60,7 +60,7 @@ for k,v in pairs(fileNames or {}) do
     	local is_lua_file = string.find(v, ".lua", -4, true)
     	if dot_index ~= nil and is_lua_file then
 	    	local name_without_ex = string.sub(v, 1, dot_index-1)
-	    	-- print('test_all.lua init test file name : ', name_without_ex)
+	    	print('test_all.lua init test file name : ', name_without_ex)
 			require(name_without_ex)
 		end
 	end
