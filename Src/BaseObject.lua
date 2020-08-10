@@ -5,6 +5,7 @@ function BaseObject:ctor(world)
         self:Init(world)
     end
     self:Awake()
+    ECS.Dispatcher:Register(self)
 end
 
 function BaseObject:Awake()
