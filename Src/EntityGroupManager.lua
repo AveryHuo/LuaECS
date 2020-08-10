@@ -1,13 +1,13 @@
-local EntityGroupData = ECS.BaseClass()
+local EntityGroupData = class()
 ECS.EntityGroupData = EntityGroupData
 
-local MatchingArchetypes = ECS.BaseClass()
+local MatchingArchetypes = class()
 ECS.MatchingArchetypes = MatchingArchetypes
 
-local EntityGroupManager = ECS.BaseClass()
+local EntityGroupManager = class()
 ECS.EntityGroupManager = EntityGroupManager
 
-function EntityGroupManager:Constructor( safetyManager )
+function EntityGroupManager:ctor( safetyManager )
     self.m_JobSafetyManager = safetyManager
 end
 
@@ -30,7 +30,7 @@ function EntityGroupManager:CreateEntityGroup( typeMan, entityDataManager, arche
         self:AddArchetypeIfMatchingWithGroup(type, grp)
         type = type.PrevArchetype
     end
-    return ECS.ComponentGroup.New(grp, self.m_JobSafetyManager, typeMan, entityDataManager)
+    return ECS.ComponentGroup.new(grp, self.m_JobSafetyManager, typeMan, entityDataManager)
 end
 
 function EntityGroupManager:CreateEntityGroupByNames( typeMan, entityDataManager, requiredComponents )

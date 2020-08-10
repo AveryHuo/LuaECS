@@ -1,4 +1,4 @@
-local EntityDataManager = ECS.BaseClass()
+local EntityDataManager = class()
 ECS.EntityDataManager = EntityDataManager
 
 local EntityData = {
@@ -7,7 +7,7 @@ local EntityData = {
 	Chunk = nil,
 	IndexInChunk = 0
 }
-function EntityDataManager:Constructor( )
+function EntityDataManager:ctor( )
 	self.m_EntitiesCapacity = 10
     self.m_Entities = self:CreateEntityData(self.m_EntitiesCapacity)
 	self.m_EntitiesFreeIndex = 1

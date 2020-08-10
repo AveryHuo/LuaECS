@@ -23,8 +23,8 @@ function ComponentSystemInjection.Inject( componentSystem, world, entityManager,
 	end
 end
 
-function ComponentSystemInjection:InjectConstructorDependencies( manager, world, field_info, inject_field_name )
-	manager[inject_field_name] = world:GetOrCreateManager(field_info[2])	
+function ComponentSystemInjection:InjectctorDependencies( manager, world, field_info, inject_field_name )
+	manager[inject_field_name] = world:GetOrCreateSystem(field_info[2])	
 end
 
 return ComponentSystemInjection

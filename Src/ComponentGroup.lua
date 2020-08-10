@@ -1,7 +1,7 @@
-local ComponentGroup = ECS.BaseClass()
+local ComponentGroup = class()
 ECS.ComponentGroup = ComponentGroup
 
-function ComponentGroup:Constructor( groupData, safetyManager, typeManager, entityDataManager )
+function ComponentGroup:ctor( groupData, safetyManager, typeManager, entityDataManager )
 	self.m_GroupData = groupData
 	self.m_EntityDataManager = entityDataManager
 	self.m_Filter = {Type=ECS.FilterType.None, RequiredChangeVersion=0}
@@ -47,8 +47,8 @@ function ComponentGroup:ToEntityArray(  )
 end
 
 function ComponentGroup:GetComponentChunkIterator(  )
-    local length = ECS.ComponentChunkIterator.CalculateLength(self.m_GroupData.FirstMatchingArchetype, self.m_Filter)
-    local iterator = ECS.ComponentChunkIterator.New(self.m_GroupData.FirstMatchingArchetype, self.m_EntityDataManager.GlobalSystemVersion, self.m_Filter)
+    local length = ECS.ChunkIterator.CalculateLength(self.m_GroupData.FirstMatchingArchetype, self.m_Filter)
+    local iterator = ECS.ChunkIterator.new(self.m_GroupData.FirstMatchingArchetype, self.m_EntityDataManager.GlobalSystemVersion, self.m_Filter)
     return iterator, length
 end
 

@@ -248,11 +248,11 @@ local function strsplit(delimiter, text)
 end
 M.private.strsplit = strsplit
 
-local function hasNewLine( s )
+local function hasnewLine( s )
     -- return true if s has a newline
     return (string.find(s, '\n', 1, true) ~= nil)
 end
-M.private.hasNewLine = hasNewLine
+M.private.hasnewLine = hasnewLine
 
 local function prefixString( prefix, s )
     -- Prefix all the lines of s with prefix
@@ -854,7 +854,7 @@ local function prettystrPairs(value1, value2, suffix_a, suffix_b)
     Returns the two formatted strings (including padding/newlines).
     ]]
     local str1, str2 = prettystr(value1), prettystr(value2)
-    if hasNewLine(str1) or hasNewLine(str2) then
+    if hasnewLine(str1) or hasnewLine(str2) then
         -- line break(s) detected, add padding
         return "\n" .. str1 .. (suffix_a or ""), "\n" .. str2
     end

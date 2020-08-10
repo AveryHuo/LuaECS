@@ -1,7 +1,11 @@
 local ECS = ECS or {}
 
+
+
 local importer = require("Common.Importer")
 importer.enable()
+
+importer.require("Common.BaseClass")
 
 --让本框架里的文件都有ECS这个全局变量
 local ECSEnv = {
@@ -14,10 +18,8 @@ setmetatable(ECSEnv, {
 		error("attempt to set a global value", 2)
 	end,
 })
-
-ECS.BaseClass = importer.require("Common.BaseClass", ECSEnv)
 ECS.TypeManager = importer.require("Src.TypeManager", ECSEnv)
-ECS.ScriptBehaviourManager = importer.require("Src.ScriptBehaviourManager", ECSEnv)
+ECS.BaseObject = importer.require("Src.BaseObject", ECSEnv)
 ECS.World = importer.require("Src.World", ECSEnv)
 ECS.Entity = importer.require("Src.Entity", ECSEnv)
 ECS.EntityManager = importer.require("Src.EntityManager", ECSEnv)
@@ -35,16 +37,13 @@ ECS.UnsafeLinkedListNode = importer.require("Common.UnsafeLinkedListNode", ECSEn
 ECS.ChunkDataUtility = importer.require("Src.ChunkDataUtility", ECSEnv)
 ECS.ComponentSystemInjection = importer.require("Src.ComponentSystemInjection", ECSEnv)
 ECS.InjectComponentGroupData = importer.require("Src.InjectComponentGroupData", ECSEnv)
-ECS.ComponentChunkIterator = importer.require("Src.ComponentChunkIterator", ECSEnv)
+ECS.ChunkIterator = importer.require("Src.ChunkIterator", ECSEnv)
 ECS.ComponentDataArray = importer.require("Src.ComponentDataArray", ECSEnv)
 ECS.EntityArray = importer.require("Src.EntityArray", ECSEnv)
 
 local function InitWorld( worldName )
-	local world = ECS.World.New(worldName)
-	ECS.World.Active = world
-
-	world:GetOrCreateManager(ECS.EntityManager.Name)
-
+	local world = ECS.World.new(worldName)
+	ECS.World.Active = World
 	return world
 end
 

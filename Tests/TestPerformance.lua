@@ -1,5 +1,5 @@
 local ECS = require "ECS"
-TestPerformance = ECS.BaseClass(require("TestBaseClass"))
+TestPerformance = class(require("TestBaseClass"))
 
 local testTimes = 20000
 

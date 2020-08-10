@@ -1,19 +1,18 @@
-local EntityManager = ECS.BaseClass(ECS.ScriptBehaviourManager)
+local EntityManager = class(ECS.BaseObject)
 ECS.EntityManager = EntityManager
 ECS.EntityManager.Name = "ECS.EntityManager"
-ECS.TypeManager.RegisterScriptMgr(ECS.EntityManager.Name, EntityManager)
 
 local table_insert = table.insert
-function EntityManager:Constructor(  )
+function EntityManager:Init()
 	self.entities_free_id = 0
 end
 
-function EntityManager:OnCreateManager( capacity )
+function EntityManager:Awake()
 	ECS.TypeManager.Initialize()
-	self.Entities = ECS.EntityDataManager.New(capacity)
-	self.m_SharedComponentManager = ECS.SharedComponentDataManager.New()
-	self.ArchetypeManager = ECS.ArchetypeManager.New(self.m_SharedComponentManager)
-	self.m_GroupManager = ECS.EntityGroupManager.New(self.ComponentJobSafetyManager)
+	self.Entities = ECS.EntityDataManager.new()
+	self.m_SharedComponentManager = ECS.SharedComponentDataManager.new()
+	self.ArchetypeManager = ECS.ArchetypeManager.new(self.m_SharedComponentManager)
+	self.m_GroupManager = ECS.EntityGroupManager.new(self.ComponentJobSafetyManager)
 	self.m_CachedComponentTypeArray = {}
 	self.m_CachedComponentTypeInArchetypeArray = {}
 end
@@ -145,7 +144,7 @@ function EntityManager:DestroyEntity( entity )
 end
 
 function EntityManager:GetArchetypeChunkComponentType( comp_type_name, isReadOnly )
-    return ArchetypeChunkComponentType.New(comp_type_name, isReadOnly, self.GlobalSystemVersion)
+    return ArchetypeChunkComponentType.new(comp_type_name, isReadOnly, self.GlobalSystemVersion)
 end
 
 return EntityManager

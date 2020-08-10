@@ -1,7 +1,7 @@
-local SharedComponentDataManager = ECS.BaseClass()
+local SharedComponentDataManager = class()
 ECS.SharedComponentDataManager = SharedComponentDataManager
 
-function SharedComponentDataManager:Constructor(  )
+function SharedComponentDataManager:ctor(  )
 	self.m_SharedComponentData = {}
 	self.m_SharedComponentRefCount = {1}
 	self.m_SharedComponentType = {-1}

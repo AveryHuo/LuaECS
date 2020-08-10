@@ -1,9 +1,9 @@
-local ComponentChunkIterator = ECS.BaseClass()
+local ChunkIterator = class()
 
 ECS.FilterType = {
     None = 1, SharedComponent=2, Changed=3,
 }
-function ComponentChunkIterator:Constructor( match, globalSystemVersion, filter )
+function ChunkIterator:ctor( match, globalSystemVersion, filter )
 	self.m_FirstMatchingArchetype = match
 	self.m_CurrentMatchingArchetype = match
 	self.IndexInComponentGroup = -1
@@ -16,16 +16,16 @@ function ComponentChunkIterator:Constructor( match, globalSystemVersion, filter 
 	self.m_Filter = filter
 end
 
-function ComponentChunkIterator.Clone( iterator )
+function ChunkIterator.Clone( iterator )
     assert(iterator~=nil, "iterator should not be nil!")
-    return ComponentChunkIterator.New(iterator.m_FirstMatchingArchetype, iterator.m_GlobalSystemVersion, iterator.m_Filter)
+    return ChunkIterator.new(iterator.m_FirstMatchingArchetype, iterator.m_GlobalSystemVersion, iterator.m_Filter)
 end
 
-function ComponentChunkIterator:SetIndexInComponentGroup( indexInComponentGroup )
+function ChunkIterator:SetIndexInComponentGroup( indexInComponentGroup )
     self.IndexInComponentGroup = indexInComponentGroup
 end
 
-function ComponentChunkIterator:MoveToEntityIndex( index )
+function ChunkIterator:MoveToEntityIndex( index )
     if not self.m_Filter.RequiresMatchesFilter then
         if index < self.m_CurrentArchetypeEntityIndex then
             self.m_CurrentMatchingArchetype = self.m_FirstMatchingArchetype
@@ -54,7 +54,7 @@ function ComponentChunkIterator:MoveToEntityIndex( index )
     end
 end
 
-function ComponentChunkIterator:UpdateCacheToCurrentChunk( cache, isWriting, indexInComponentGroup )
+function ChunkIterator:UpdateCacheToCurrentChunk( cache, isWriting, indexInComponentGroup )
     local archetype = self.m_CurrentMatchingArchetype.Archetype
     local indexInArchetype = self.m_CurrentMatchingArchetype.IndexInArchetype[indexInComponentGroup]
     cache.CachedBeginIndex = self.m_CurrentChunkEntityIndex + self.m_CurrentArchetypeEntityIndex - 2
@@ -62,12 +62,12 @@ function ComponentChunkIterator:UpdateCacheToCurrentChunk( cache, isWriting, ind
     cache.CurChunk = self.m_CurrentChunk
 end        
 
-function ComponentChunkIterator:MoveToEntityIndexAndUpdateCache( index, cache, isWriting )
+function ChunkIterator:MoveToEntityIndexAndUpdateCache( index, cache, isWriting )
 	self:MoveToEntityIndex(index)
     self:UpdateCacheToCurrentChunk(cache, isWriting, self.IndexInComponentGroup)
 end
 
-function ComponentChunkIterator.CalculateLength( firstMatchingArchetype, filter )
+function ChunkIterator.CalculateLength( firstMatchingArchetype, filter )
     local length = 0
     if not filter.RequiresMatchesFilter then
         local match = firstMatchingArchetype
@@ -95,4 +95,4 @@ function ComponentChunkIterator.CalculateLength( firstMatchingArchetype, filter 
     return length
 end
 
-return ComponentChunkIterator
+return ChunkIterator

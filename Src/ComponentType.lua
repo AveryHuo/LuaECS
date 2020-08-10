@@ -1,4 +1,4 @@
-local ComponentType = ECS.BaseClass()
+local ComponentType = class(ECS.BaseObject)
 ECS.ComponentType = ComponentType
 
 ComponentType.AccessMode = {
@@ -7,7 +7,7 @@ ComponentType.AccessMode = {
 	Subtractive = 3,
 }
 
-function ComponentType:Constructor(  )
+function ComponentType:Awake()
 	self.TypeIndex = 0
 	self.AccessModeType = ComponentType.AccessMode.ReadWrite
 end
@@ -20,7 +20,7 @@ end
 
 function ComponentType.FromTypeIndex( typeIndex )
 	local ct = ECS.TypeManager.GetTypeInfoByIndex(typeIndex)
-    local type = ComponentType.New()
+    local type = ComponentType.new()
     type.TypeIndex = typeIndex
     type.AccessModeType = ComponentType.AccessMode.ReadWrite
     type.BufferCapacity = ct.BufferCapacity

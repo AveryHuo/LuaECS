@@ -1,10 +1,10 @@
-local ArchetypeManager = ECS.BaseClass()
+local ArchetypeManager = class()
 ECS.ArchetypeManager = ArchetypeManager
 
-function ArchetypeManager:Constructor( sharedComponentManager )
+function ArchetypeManager:ctor( sharedComponentManager )
 	self.m_SharedComponentManager = sharedComponentManager
     self.m_TypeLookup = {}
-    self.m_EmptyChunkPool = ECS.UnsafeLinkedListNode.New()
+    self.m_EmptyChunkPool = ECS.UnsafeLinkedListNode.new()
     ECS.UnsafeLinkedListNode.InitializeList(self.m_EmptyChunkPool)
 end
 
@@ -51,8 +51,8 @@ function ArchetypeManager:CreateArchetypeInternal( types, count, groupManager )
     type.PrevArchetype = self.m_LastArchetype
     self.m_LastArchetype = type
 
-    type.ChunkList = ECS.UnsafeLinkedListNode.New()
-    type.ChunkListWithEmptySlots = ECS.UnsafeLinkedListNode.New()
+    type.ChunkList = ECS.UnsafeLinkedListNode.new()
+    type.ChunkListWithEmptySlots = ECS.UnsafeLinkedListNode.new()
     ECS.UnsafeLinkedListNode.InitializeList(type.ChunkList)
     ECS.UnsafeLinkedListNode.InitializeList(type.ChunkListWithEmptySlots)
 
@@ -85,9 +85,9 @@ function ArchetypeManager:ConstructChunk( archetype, chunk, sharedComponentDataI
 
     chunk.Count = 0
     chunk.Capacity = archetype.ChunkCapacity
-    chunk.ChunkListNode = ECS.UnsafeLinkedListNode.New()
+    chunk.ChunkListNode = ECS.UnsafeLinkedListNode.new()
     chunk.ChunkListNode:SetChunk(chunk)
-    chunk.ChunkListWithEmptySlotsNode = ECS.UnsafeLinkedListNode.New()
+    chunk.ChunkListWithEmptySlotsNode = ECS.UnsafeLinkedListNode.new()
     chunk.ChunkListWithEmptySlotsNode:SetChunk(chunk)
 
     for k,v in pairs(archetype.Types) do
@@ -185,7 +185,7 @@ function ArchetypeManager:GetChunkWithEmptySlots( archetype, sharedComponentData
     -- Try empty chunk pool
     if not self.m_EmptyChunkPool or self.m_EmptyChunkPool:IsEmpty() then
         -- Allocate new chunk
-        newChunk = ECS.Chunk.New()
+        newChunk = ECS.Chunk.new()
     else
         newChunk = self.m_EmptyChunkPool:Begin()
         newChunk = newChunk:GetChunk()

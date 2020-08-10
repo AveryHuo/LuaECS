@@ -1,5 +1,5 @@
 local ECS = require "ECS"
-TestEntityManager = ECS.BaseClass(require("TestBaseClass"))
+TestEntityManager = class(require("TestBaseClass"))
 
 function TestEntityManager:TestIncreaseEntityCapacity(  )
     local EcsTestData = {value=0}

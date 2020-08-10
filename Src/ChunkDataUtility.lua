@@ -236,7 +236,7 @@ function ChunkDataUtility.Convert( srcChunk, srcIndex, dstChunk, dstIndex )
     end
 end
 
-function ChunkDataUtility.PoisonUnusedChunkData( chunk, value )
+function ChunkDataUtility.ReleaseUnusedChunkData( chunk, value )
     local arch = chunk.Archetype
     local bufferSize = Chunk.GetChunkBufferSize(arch.TypesCount, arch.NumSharedComponents)
     local buffer = chunk.Buffer

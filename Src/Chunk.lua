@@ -1,9 +1,8 @@
-local Chunk = ECS.BaseClass()
+local Chunk = class()
 ECS.Chunk = Chunk
 ECS.Chunk.kChunkSize = 16 * 1024
 
-function Chunk:Constructor(  )
-	-- self.Buffer = ECS.Core.CreateChunk(ECS.Chunk.kChunkSize)
+function Chunk:ctor(  )
 	self.Buffer = {}
 	self.Count = 0--当前Entity的数量
 	self.Capacity = 0--能存放Entity的容量
@@ -11,7 +10,6 @@ function Chunk:Constructor(  )
 	self.Archetype = nil
 	self.ChunkListNode = nil
 	self.ChunkListWithEmptySlotsNode = nil
-	
 end
 
 function Chunk.GetChunkBufferSize( numComponents, numSharedComponents )

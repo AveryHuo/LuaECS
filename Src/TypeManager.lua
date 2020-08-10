@@ -100,16 +100,16 @@ function TypeManager.GetTypeNameByIndex( typeIndex )
 	return info and info.Name or "UnkownTypeName"
 end
 
-function TypeManager.RegisterScriptMgr( name, system )
+function TypeManager.RegisterSystemType( name, system )
 	assert(TypeManager.s_Systems[name]==nil, "had register system :"..name)
 	TypeManager.s_Systems[name] = system
 end
 
-function TypeManager.GetScriptMgr( name )
+function TypeManager.GetSystemType( name )
 	return TypeManager.s_Systems[name]
 end
 
-function TypeManager.GetScriptMgrMap( )
+function TypeManager.GetSystemTypeMap( )
 	return TypeManager.s_Systems
 end
 

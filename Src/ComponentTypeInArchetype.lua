@@ -1,13 +1,13 @@
-local ComponentTypeInArchetype = ECS.BaseClass()
+local ComponentTypeInArchetype = class()
 ECS.ComponentTypeInArchetype = ComponentTypeInArchetype
 
-function ComponentTypeInArchetype:Constructor( type )
+function ComponentTypeInArchetype:ctor( type )
 	self.TypeIndex = type.TypeIndex
     self.BufferCapacity = type.BufferCapacity
 end
 
 function ComponentTypeInArchetype.Create( type )
-	local arche = ComponentTypeInArchetype.New(type)
+	local arche = ComponentTypeInArchetype.new(type)
 	ComponentTypeInArchetype.InitMetaTable(arche)
 	return arche
 end

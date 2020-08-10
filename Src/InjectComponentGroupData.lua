@@ -1,7 +1,7 @@
-local InjectComponentGroupData = ECS.BaseClass()
+local InjectComponentGroupData = class()
 ECS.InjectComponentGroupData = InjectComponentGroupData
 
-function InjectComponentGroupData:Constructor( system, injectGroupName, componentRequirements, componentDataInjections, lengthFieldInfo )
+function InjectComponentGroupData:ctor( system, injectGroupName, componentRequirements, componentDataInjections, lengthFieldInfo )
 	self.system = system
 	self.m_InjectGroupName = injectGroupName
 	self.m_ComponentDataInjections = componentDataInjections
@@ -18,14 +18,14 @@ function InjectComponentGroupData.CreateInjection( injectGroupName, groupField, 
 	local componentDataInjections = {}
 	local lengthFieldInfo = {}
 	InjectComponentGroupData.CollectInjectedGroup(system, groupField, componentRequirements, componentDataInjections, lengthFieldInfo)
-	return InjectComponentGroupData.New(system, injectGroupName, componentRequirements, componentDataInjections, lengthFieldInfo)
+	return InjectComponentGroupData.new(system, injectGroupName, componentRequirements, componentDataInjections, lengthFieldInfo)
 end
 
 function InjectComponentGroupData:UpdateInjection(  )
     local origin_iterator, length = self.m_EntityGroup:GetComponentChunkIterator()
     self.system[self.m_InjectGroupName] = {}
 	for i,v in ipairs(self.m_ComponentDataInjections) do
-    	local iterator = ECS.ComponentChunkIterator.Clone(origin_iterator)
+    	local iterator = ECS.ChunkIterator.Clone(origin_iterator)
 	    iterator:SetIndexInComponentGroup(self.m_ComponentDataInjections[i].IndexInComponentGroup)
         local data = ECS.ComponentDataArray.Create(iterator, length, self.m_ComponentDataInjections[i].ComponentTypeName)
         self.system[self.m_InjectGroupName][self.m_ComponentDataInjections[i].InjectFieldName] = data

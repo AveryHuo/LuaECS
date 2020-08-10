@@ -1,7 +1,7 @@
-local UnsafeLinkedListNode = ECS.BaseClass()
+local UnsafeLinkedListNode = class()
 ECS.UnsafeLinkedListNode = UnsafeLinkedListNode
 
-function UnsafeLinkedListNode:Constructor(  )
+function UnsafeLinkedListNode:ctor(  )
 end
 
 function UnsafeLinkedListNode.InitializeList( list )
