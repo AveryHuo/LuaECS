@@ -10,8 +10,7 @@ end
 function EntityManager:Awake()
 	ECS.TypeManager.Initialize()
 	self.Entities = ECS.EntityDataManager.new()
-	self.m_SharedComponentManager = ECS.SharedComponentDataManager.new()
-	self.ArchetypeManager = ECS.ArchetypeManager.new(self.m_SharedComponentManager)
+	self.ArchetypeManager = ECS.ArchetypeManager.new()
 	self.m_GroupManager = ECS.EntityGroupManager.new(self.ComponentJobSafetyManager)
 	self.m_CachedComponentTypeArray = {}
 	self.m_CachedComponentTypeInArchetypeArray = {}
@@ -80,22 +79,22 @@ function EntityManager:Instantiate( srcEntity )
         assert(false, "srcEntity is not a valid entity")
     end
 
-    self.Entities:InstantiateEntities(self.ArchetypeManager, self.m_SharedComponentManager, self.m_GroupManager, srcEntity, outputEntities,
+    self.Entities:InstantiateEntities(self.ArchetypeManager,  self.m_GroupManager, srcEntity, outputEntities,
         count, self.m_CachedComponentTypeInArchetypeArray)
 end
 
 function EntityManager:AddComponent( entity, comp_type_name )
-    self.Entities:AddComponent(entity, comp_type_name, self.ArchetypeManager, self.m_SharedComponentManager, self.m_GroupManager,
+    self.Entities:AddComponent(entity, comp_type_name, self.ArchetypeManager,  self.m_GroupManager,
         self.m_CachedComponentTypeInArchetypeArray)
 end
 
 function EntityManager:RemoveComponent( entity, comp_type_name )
     self.Entities:AssertEntityHasComponent(entity, comp_type_name)
-    self.Entities:RemoveComponent(entity, comp_type_name, self.ArchetypeManager, self.m_SharedComponentManager, self.m_GroupManager)
+    self.Entities:RemoveComponent(entity, comp_type_name, self.ArchetypeManager, self.m_GroupManager)
 
     local archetype = self.Entities:GetArchetype(entity)
     if (archetype.SystemStateCleanupComplete) then
-        self.Entities:TryRemoveEntityId(entity, 1, self.ArchetypeManager, self.m_SharedComponentManager, self.m_GroupManager, self.m_CachedComponentTypeInArchetypeArray)
+        self.Entities:TryRemoveEntityId(entity, 1, self.ArchetypeManager,  self.m_GroupManager, self.m_CachedComponentTypeInArchetypeArray)
     end
 end
 

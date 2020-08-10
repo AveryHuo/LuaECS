@@ -25,7 +25,7 @@ function ComponentSystem:Awake( )
     end
 
     self.PostUpdateCommands = nil
-    ECS.ComponentSystemInjection.Inject(self, world, self.m_EntityManager, self.m_InjectedComponentGroups, self.m_InjectFromEntityData)
+    ECS.ComponentSystemInjection.Inject(self, self.m_InjectedComponentGroups)
     self:UpdateInjectedComponentGroups()
 end
 

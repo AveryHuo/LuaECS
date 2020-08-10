@@ -17,7 +17,7 @@ function InjectComponentGroupData.CreateInjection( injectGroupName, groupField, 
 	local componentRequirements = {}
 	local componentDataInjections = {}
 	local lengthFieldInfo = {}
-	InjectComponentGroupData.CollectInjectedGroup(system, groupField, componentRequirements, componentDataInjections, lengthFieldInfo)
+	InjectComponentGroupData.CollectInjectedGroup(groupField, componentRequirements, componentDataInjections, lengthFieldInfo)
 	return InjectComponentGroupData.new(system, injectGroupName, componentRequirements, componentDataInjections, lengthFieldInfo)
 end
 
@@ -35,7 +35,7 @@ function InjectComponentGroupData:UpdateInjection(  )
 	end
 end
 
-function InjectComponentGroupData.CollectInjectedGroup( system, groupField, componentRequirements, componentDataInjections, lengthFieldInfo )
+function InjectComponentGroupData.CollectInjectedGroup( groupField, componentRequirements, componentDataInjections, lengthFieldInfo )
 	local field_info
 	for field_name,v in pairs(groupField) do
 		local field_info = Split(v, ":")

@@ -6,7 +6,6 @@ function World:ctor( name )
 	self.name = name
 	self.entityManager = ECS.EntityManager.new(self)
 	self.systems = {}
-	self.systems_lookup = {}
 
 	self.IsCreated = true
 	table.insert(ECS.World.allWorlds, self)
@@ -35,21 +34,21 @@ function World:CreateSystem( script_system_type, arge )
 			mgr[k] = v
 		end
 	end
-	table.insert(self.systems, mgr)
-	self.systems_lookup[script_system_type] = mgr
+	self.systems[script_system_type] = mgr
 	return mgr
 end
 
 function World:GetExistingSystem( script_system_type )
-	return self.systems_lookup[script_system_type]
+	return self.systems[script_system_type]
 end
 
 function World:DestroySystem( System_name )
-	if not self.systems_lookup[System_name] then
-		assert(self.systems_lookup[System_name], System_name.." System does not exist in the world")
+	if not self.systems[System_name] then
+		assert(self.systems[System_name], System_name.." System does not exist in the world")
 	end
     -- Version = Version + 1
-    self.systems_lookup[System_name]:Dispose()
+	self.systems[System_name]:Dispose()
+	self.systems[System_name] = nil
 end
 
 return World

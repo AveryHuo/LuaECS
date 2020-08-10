@@ -11,8 +11,7 @@ local IsFindInStrList = function ( str_list, find_str )
 	return false
 end
 
-function ComponentSystemInjection.Inject( componentSystem, world, entityManager,
-            outInjectGroups, outInjectFromEntityData )
+function ComponentSystemInjection.Inject( componentSystem, outInjectGroups )
 	local inject_info_list = componentSystem:GetInjectInfoList()
 	for i,v in ipairs(inject_info_list) do
 		local inject_field_name = v[1]

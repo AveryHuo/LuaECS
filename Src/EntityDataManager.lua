@@ -80,10 +80,9 @@ end
 
 function EntityDataManager:CreateEntities( archetypeManager, archetype, count )
     local entities = {}
-    -- local sharedComponentDataIndices = {}
     local num = 0
     while count ~= 0 do
-        local chunk = archetypeManager:GetChunkWithEmptySlots(archetype, sharedComponentDataIndices)
+        local chunk = archetypeManager:GetChunkWithEmptySlots(archetype)
         local allocatedIndex
         local allocatedCount, allocatedIndex = archetypeManager:AllocateIntoChunk(chunk, count)
         num = num + allocatedCount
@@ -113,7 +112,7 @@ function EntityDataManager:GetArchetype( entity )
     return self.m_Entities.Archetype[entity.Index]
 end
 
-function EntityDataManager:AddComponent( entity, comp_type_name, archetypeManager, sharedComponentDataManager, groupManager, componentTypeInArchetypeArray )
+function EntityDataManager:AddComponent( entity, comp_type_name, archetypeManager, groupManager, componentTypeInArchetypeArray )
     local componentType = ECS.ComponentTypeInArchetype.Create(ECS.ComponentType.Create(comp_type_name))
 	local archetype = self:GetArchetype(entity)
 
@@ -131,47 +130,12 @@ function EntityDataManager:AddComponent( entity, comp_type_name, archetypeManage
     end
     local newType = archetypeManager:GetOrCreateArchetype(componentTypeInArchetypeArray,
         archetype.TypesCount + 1, groupManager)
-    local sharedComponentDataIndices = nil
-    if newType.NumSharedComponents > 0 then
-        local oldSharedComponentDataIndices = self:GetComponentChunk(entity).SharedComponentValueArray
-        if type.IsSharedComponent then
-            -- local stackAlloced = stackalloc int[newType.NumSharedComponents]
-            sharedComponentDataIndices = stackAlloced
 
-            if archetype.SharedComponentOffset == nil then
-                sharedComponentDataIndices[1] = 0
-            else
-                t = 1
-                local sharedIndex = 1
-                while t <= archetype.TypesCount and archetype.Types[t] < componentType do
-                    if archetype.SharedComponentOffset[t] ~= -1 then
-                        sharedComponentDataIndices[sharedIndex] = oldSharedComponentDataIndices[sharedIndex]
-                        sharedIndex = sharedIndex + 1
-                    end
-                    t = t + 1
-                end
-
-                sharedComponentDataIndices[sharedIndex] = 0
-                while (t <= archetype.TypesCount) do
-                    if (archetype.SharedComponentOffset[t] ~= -1) then
-                        sharedComponentDataIndices[sharedIndex + 1] =
-                            oldSharedComponentDataIndices[sharedIndex]
-                        sharedIndex = sharedIndex + 1
-                    end
-                    t = t + 1
-                end
-            end
-        else
-            -- reuse old sharedComponentDataIndices
-            sharedComponentDataIndices = oldSharedComponentDataIndices
-        end
-    end
-
-    self:SetArchetype(archetypeManager, entity, newType, sharedComponentDataIndices)
-    self:IncrementComponentOrderVersion(newType, self:GetComponentChunk(entity), sharedComponentDataManager)
+    self:SetArchetype(archetypeManager, entity, newType)
+    self:IncrementComponentOrderVersion(newType, self:GetComponentChunk(entity))
 end
 
-function EntityDataManager:RemoveComponent( entity, comp_type_name, archetypeManager, sharedComponentDataManager, groupManager )
+function EntityDataManager:RemoveComponent( entity, comp_type_name, archetypeManager, groupManager )
     local componentType = ECS.ComponentTypeInArchetype.Create(ECS.ComponentType.Create(comp_type_name))
     local archetype = self:GetArchetype(entity)
     local removedTypes = 0
@@ -188,20 +152,8 @@ function EntityDataManager:RemoveComponent( entity, comp_type_name, archetypeMan
     local newType = archetypeManager:GetOrCreateArchetype(componentTypeInArchetypeArray,
         archetype.TypesCount - removedTypes, groupManager)
 
-    local sharedComponentDataIndices = self:GetComponentChunk(entity).SharedComponentValueArray
-    if ((newType.NumSharedComponents > 0) and (newType.NumSharedComponents ~= archetype.NumSharedComponents)) then
-        local oldSharedComponentDataIndices = sharedComponentDataIndices
-        -- local tempAlloc = stackalloc int[newType.NumSharedComponents]
-        local tempAlloc = {}
-        sharedComponentDataIndices = tempAlloc
-
-        local indexOfRemovedSharedComponent = archetype.SharedComponentOffset[indexInOldTypeArray]
-        UnsafeUtility.MemCpy(sharedComponentDataIndices, oldSharedComponentDataIndices, indexOfRemovedSharedComponent*sizeof(int))
-        UnsafeUtility.MemCpy(sharedComponentDataIndices + indexOfRemovedSharedComponent, oldSharedComponentDataIndices + indexOfRemovedSharedComponent + 1, (newType.NumSharedComponents-indexOfRemovedSharedComponent)*sizeof(int))
-    end
-
-    self:IncrementComponentOrderVersion(archetype, self:GetComponentChunk(entity), sharedComponentDataManager)
-    self:SetArchetype(archetypeManager, entity, newType, sharedComponentDataIndices)
+    self:IncrementComponentOrderVersion(archetype, self:GetComponentChunk(entity))
+    self:SetArchetype(archetypeManager, entity, newType)
 end
 
 function EntityDataManager:IncrementComponentOrderVersion(  )
@@ -236,12 +188,12 @@ function EntityDataManager:TryRemoveEntityId( entity, archetypeManager )
 
     ECS.ChunkDataUtility.Copy(chunk, chunk.Count - patchCount, chunk, indexInChunk, patchCount)
 
-    self:IncrementComponentOrderVersion(archetype, chunk, sharedComponentDataManager)
+    self:IncrementComponentOrderVersion(archetype, chunk)
     chunk.Archetype.EntityCount = chunk.Archetype.EntityCount - batchCount
     archetypeManager:SetChunkCount(chunk, chunk.Count - batchCount)
 end
 
-function EntityDataManager:TryRemoveEntityIdArray( entities, count, archetypeManager, sharedComponentDataManager, groupManager, componentTypeInArchetypeArray )
+function EntityDataManager:TryRemoveEntityIdArray( entities, count, archetypeManager, groupManager, componentTypeInArchetypeArray )
     local entityIndex = 0;
     while (entityIndex ~= count) do
         local indexInChunk
@@ -252,7 +204,7 @@ function EntityDataManager:TryRemoveEntityIdArray( entities, count, archetypeMan
         local archetype = GetArchetype(entities[entityIndex])
         if (not archetype.SystemStateCleanupNeeded) then
             DeallocateDataEntitiesInChunk(manager, entities + entityIndex, chunk, indexInChunk, batchCount)
-            self:IncrementComponentOrderVersion(chunk.Archetype, chunk, sharedComponentDataManager)
+            self:IncrementComponentOrderVersion(chunk.Archetype, chunk)
 
             if (chunk.ManagedArrayIndex >= 0) then
                 -- We can just chop-off the end, no need to copy anything
@@ -290,47 +242,16 @@ function EntityDataManager:TryRemoveEntityIdArray( entities, count, archetypeMan
                 local newType = archetypeManager.GetOrCreateArchetype(componentTypeInArchetypeArray,
                     archetype.TypesCount - removedTypes + 1, groupManager)
 
-                local sharedComponentDataIndices = nil
-                if (newType.NumSharedComponents > 0) then
-                    local oldSharedComponentDataIndices =
-                        GetComponentChunk(entity).SharedComponentValueArray
-                    if (removedComponentIsShared) then
-                        local tempAlloc = {}
-                        sharedComponentDataIndices = tempAlloc
-
-                        local srcIndex = 0
-                        local dstIndex = 0
-                        for t=1,archetype.TypesCount do
-                            if (archetype.SharedComponentOffset[t] ~= -1) then
-                                local typeIndex = archetype.Types[t].TypeIndex
-                                local systemStateType = typeof(ISystemStateComponentData).IsAssignableFrom(TypeManager.GetType(typeIndex))
-                                local systemStateSharedType = typeof(ISystemStateSharedComponentData).IsAssignableFrom(TypeManager.GetType(typeIndex))
-                                if (not (systemStateType or systemStateSharedType)) then
-                                    srcIndex = srcIndex + 1
-                                else
-                                    sharedComponentDataIndices[dstIndex] =
-                                        oldSharedComponentDataIndices[srcIndex]
-                                    srcIndex = srcIndex + 1
-                                    dstIndex = dstIndex + 1
-                                end
-                            end
-                        end
-                    else
-                        -- reuse old sharedComponentDataIndices
-                        sharedComponentDataIndices = oldSharedComponentDataIndices;
-                    end
-                end
-                self:IncrementComponentOrderVersion(archetype, GetComponentChunk(entity),
-                    sharedComponentDataManager);
-                self:SetArchetype(archetypeManager, entity, newType, sharedComponentDataIndices);
+                self:IncrementComponentOrderVersion(archetype, GetComponentChunk(entity));
+                self:SetArchetype(archetypeManager, entity, newType);
             end
         end
     end
     entityIndex = entityIndex + batchCount
 end
 
-function EntityDataManager:SetArchetype( typeMan, entity, archetype, sharedComponentDataIndices )
-    local chunk = typeMan:GetChunkWithEmptySlots(archetype, sharedComponentDataIndices)
+function EntityDataManager:SetArchetype( typeMan, entity, archetype )
+    local chunk = typeMan:GetChunkWithEmptySlots(archetype)
     local allocatedCount, chunkIndex = typeMan:AllocateIntoChunk(chunk)
 
     local oldArchetype = self.m_Entities.Archetype[entity.Index]
