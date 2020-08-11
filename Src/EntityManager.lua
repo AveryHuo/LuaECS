@@ -55,7 +55,7 @@ function EntityManager:CreateArchetype( types )
     local cachedComponentCount = self:PopulatedCachedTypeInArchetypeArray(types, #types)
 
     local entityArchetype = {}
-    entityArchetype.Archetype =
+    entityArchetype.Archetype = 
         self.ArchetypeManager:GetExistingArchetype(self.m_CachedComponentTypeInArchetypeArray, cachedComponentCount)
     if entityArchetype.Archetype ~= nil then
         return entityArchetype
