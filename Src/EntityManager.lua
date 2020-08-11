@@ -1,4 +1,4 @@
-local EntityManager = class(ECS.BaseObject)
+local EntityManager = class(ECS.BehaviourObject)
 ECS.EntityManager = EntityManager
 ECS.EntityManager.Name = "ECS.EntityManager"
 

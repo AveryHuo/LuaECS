@@ -1,4 +1,4 @@
-local Entity = class(ECS.BaseObject)
+local Entity = class()
 ECS.Entity = Entity
 ECS.Entity.Name = "ECS.Entity"
 ECS.Entity.Size = nil --Init In CoreHelper

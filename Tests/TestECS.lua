@@ -16,6 +16,6 @@ function TestECS:TestCreate(  )
 
     local archetype = self.m_Manager:CreateArchetype({"MoveData"})
     local entity = self.m_Manager:CreateEntityByArcheType(archetype)
-
     system:Update()
+    self.m_Manager:DestroyEntity(entity)
 end

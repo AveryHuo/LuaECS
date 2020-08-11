@@ -19,7 +19,7 @@ setmetatable(ECSEnv, {
 
 ECS.Dispatcher = importer.require("Src.BehaviourDispatch", ECSEnv)
 ECS.TypeManager = importer.require("Src.TypeManager", ECSEnv)
-ECS.BaseObject = importer.require("Src.BaseObject", ECSEnv)
+ECS.BehaviourObject = importer.require("Src.BehaviourObject", ECSEnv)
 ECS.World = importer.require("Src.World", ECSEnv)
 ECS.Entity = importer.require("Src.Entity", ECSEnv)
 ECS.EntityManager = importer.require("Src.EntityManager", ECSEnv)
@@ -49,6 +49,7 @@ end
 ECS.Dispatcher:OnLoad()
 ECS.InitWorld = InitWorld
 
+ECS.Dispatcher:Update()
 --为了不影响全局，这里要还原一下package.searchers
 importer.disable()
 

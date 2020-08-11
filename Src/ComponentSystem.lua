@@ -1,4 +1,4 @@
-local ComponentSystem = class(ECS.BaseObject)
+local ComponentSystem = class(ECS.BehaviourObject)
 
 function ComponentSystem:Init( world)
     self.m_InjectedComponentGroups = {}
@@ -30,6 +30,7 @@ function ComponentSystem:Awake( )
 end
 
 function ComponentSystem:Update(  )
+    print("ComponentSystem:Update run!")
 	if self.Enabled and self:ShouldRunSystem() then
         if not self.m_PreviouslyEnabled then
             self.m_PreviouslyEnabled = true
