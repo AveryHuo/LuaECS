@@ -8,13 +8,13 @@ local EntityGroupManager = class()
 ECS.EntityGroupManager = EntityGroupManager
 
 function EntityGroupManager:ctor( safetyManager )
-    self.m_JobSafetyManager = safetyManager
+    self.jobSafetyManager = safetyManager
 end
 
 function EntityGroupManager:CreateEntityGroup( typeMan, entityDataManager, archetypeQueries, archetypeFiltersCount, requiredComponents, requiredComponentsCount )
 	local grp = {}
-    grp.PrevGroup = self.m_LastGroupData
-    self.m_LastGroupData = grp
+    grp.PrevGroup = self.lastGroupData
+    self.lastGroupData = grp
     grp.RequiredComponentsCount = requiredComponentsCount
     grp.RequiredComponents = requiredComponents
     -- self:InitializeReaderWriter(grp, requiredComponents, requiredComponentsCount)
@@ -25,12 +25,12 @@ function EntityGroupManager:CreateEntityGroup( typeMan, entityDataManager, arche
     grp.ArchetypeQueryCount = archetypeFiltersCount
     grp.FirstMatchingArchetype = nil
     grp.LastMatchingArchetype = nil
-    local type = typeMan.m_LastArchetype
+    local type = typeMan.lastArcheType
     while type ~= nil do
         self:AddArchetypeIfMatchingWithGroup(type, grp)
         type = type.PrevArchetype
     end
-    return ECS.ComponentGroup.new(grp, self.m_JobSafetyManager, typeMan, entityDataManager)
+    return ECS.ComponentGroup.new(grp, self.jobSafetyManager, typeMan, entityDataManager)
 end
 
 function EntityGroupManager:CreateEntityGroupByNames( typeMan, entityDataManager, requiredComponents )
@@ -88,7 +88,7 @@ function EntityGroupManager:CreateQuery( comp_names )
 end
 
 function EntityGroupManager:AddArchetypeIfMatching( type )
-	local grp = self.m_LastGroupData
+	local grp = self.lastGroupData
 	while grp ~= nil do 
 		self:AddArchetypeIfMatchingWithGroup(type, grp)
 		grp = grp.PrevGroup

@@ -2,9 +2,9 @@ local ArchetypeManager = class()
 ECS.ArchetypeManager = ArchetypeManager
 
 function ArchetypeManager:ctor(  )
-    self.m_TypeLookup = {}
-    self.m_EmptyChunkPool = ECS.UnsafeLinkedListNode.new()
-    ECS.UnsafeLinkedListNode.InitializeList(self.m_EmptyChunkPool)
+    self.archeTypes = {}
+    self.emptyChunkPool = ECS.UnsafeLinkedListNode.new()
+    ECS.UnsafeLinkedListNode.InitializeList(self.emptyChunkPool)
 end
 
 local GetTypesStr = function ( types, count )
@@ -24,7 +24,7 @@ end
 
 function ArchetypeManager:GetExistingArchetype( types, count )
     local type_str = GetTypesStr(types, count)
-    return self.m_TypeLookup[type_str]
+    return self.archeTypes[type_str]
 end
 
 function ArchetypeManager:CreateArchetypeInternal( types, count, groupManager )
@@ -45,8 +45,8 @@ function ArchetypeManager:CreateArchetypeInternal( types, count, groupManager )
     type.NumManagedArrays = 0
     type.ManagedArrayOffset = nil
 
-    type.PrevArchetype = self.m_LastArchetype
-    self.m_LastArchetype = type
+    type.PrevArchetype = self.lastArcheType
+    self.lastArcheType = type
 
     type.ChunkList = ECS.UnsafeLinkedListNode.new()
     type.ChunkListWithEmptySlots = ECS.UnsafeLinkedListNode.new()
@@ -54,7 +54,7 @@ function ArchetypeManager:CreateArchetypeInternal( types, count, groupManager )
     ECS.UnsafeLinkedListNode.InitializeList(type.ChunkListWithEmptySlots)
 
     local type_str = GetTypesStr(types, count)
-    self.m_TypeLookup[type_str] = type
+    self.archeTypes[type_str] = type
 
     groupManager:AddArchetypeIfMatching(type)
     return type
@@ -111,7 +111,7 @@ function ArchetypeManager:SetChunkCount( chunk, newCount )
         chunk.ChunkListNode:Remove()
         chunk.ChunkListWithEmptySlotsNode:Remove()
 
-        self.m_EmptyChunkPool:Add(chunk.ChunkListNode)
+        self.emptyChunkPool:Add(chunk.ChunkListNode)
     -- Chunk is now full
     elseif (newCount == capacity) then
         chunk.ChunkListWithEmptySlotsNode:Remove()
@@ -143,11 +143,11 @@ function ArchetypeManager:GetChunkWithEmptySlots( archetype )
 
     local newChunk
     -- Try empty chunk pool
-    if not self.m_EmptyChunkPool or self.m_EmptyChunkPool:IsEmpty() then
+    if not self.emptyChunkPool or self.emptyChunkPool:IsEmpty() then
         -- Allocate new chunk
         newChunk = ECS.Chunk.new()
     else
-        newChunk = self.m_EmptyChunkPool:Begin()
+        newChunk = self.emptyChunkPool:Begin()
         newChunk = newChunk:GetChunk()
         newChunk.ChunkListNode:Remove()
     end
