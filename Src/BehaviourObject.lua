@@ -9,6 +9,7 @@ function BehaviourObject:ctor(world)
 end
 
 function BehaviourObject:Awake()
+    print("BehaviourObject:Awake")
 end
 
 function BehaviourObject:Update()

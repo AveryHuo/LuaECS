@@ -3,11 +3,11 @@ TestComponentSystem = class(require("TestBaseClass"))
 
 local TestSystem = class(ECS.ComponentSystem)
 ECS.TypeManager.RegisterSystemType("TestSystem", TestSystem)
-function TestSystem:SystemAwake()
+function TestSystem:OnAwake()
     print("TestSystem awake")
 end
 
-function TestSystem:SystemUpdate()
+function TestSystem:OnUpdate()
     print("TestSystem update")
 end
 
@@ -59,73 +59,14 @@ function TestComponentSystem:TestGetComponentGroup()
     lu.assertEquals(3, #empty_sys.m_ComponentGroups)
 end
 
-local TestInjectSystem = class(ECS.ComponentSystem)
-ECS.TypeManager.RegisterSystemType("TestInjectSystem", TestInjectSystem)
-
-function TestInjectSystem:SystemAwake(  )
-    local data = {
-        position = "Array:DataForTestInject1",
-        flag = "Array:DataForTestInject3",
-        len = "Length",
-    }
-    self:Inject("m_Data", data)
-end
-function TestInjectSystem:SystemUpdate(  )
-end
-function TestComponentSystem:TestInject(  )
-    ECS.TypeManager.RegisterType("DataForTestInject1", {x=0, y=false, z=0})
-    ECS.TypeManager.RegisterType("DataForTestInject2", {x=false, b=false})
-    ECS.TypeManager.RegisterType("DataForTestInject3", {value=0})
-
-    local sys = ECS.World.Active:GetOrCreateSystem("TestInjectSystem")
-    -- sys:Update()
-    lu.assertNotNil(sys.m_Data)
-    lu.assertEquals(sys.m_Data.len, 0)
-    lu.assertNil(sys.m_Data.position[1])
-    lu.assertNil(sys.m_Data.flag[1])
-
-    local archetype = self.m_Manager:CreateArchetype({"DataForTestInject1", "DataForTestInject2", "DataForTestInject3"})
-    local entity = self.m_Manager:CreateEntityByArcheType(archetype)
-    sys:Update()
-    lu.assertEquals(sys.m_Data.len, 1)
-    local pos = sys.m_Data.position[1]
-    lu.assertNotNil(pos)
-    lu.assertEquals(pos.x, 0)
-    lu.assertEquals(pos.y, false)
-    lu.assertEquals(pos.z, 0)
-    lu.assertNil(sys.m_Data.position[2])
-
-    local flag = sys.m_Data.flag[1]
-    lu.assertNotNil(flag)
-    lu.assertEquals(flag.value, 0)
-
-    -- self.m_Manager:SetComponentData(entity, "DataForTestInject1", {x=1.23, y=true, z=789})
-    -- sys.m_Data.flag[1] = {value=456}
-    -- 以上两个调用方式是同价的
-    self.m_Manager:SetComponentData(entity, "DataForTestInject3", {value=456})
-    sys.m_Data.position[1] = {x=1.23, y=true, z=789}
-
-    sys:Update()
-    lu.assertEquals(sys.m_Data.len, 1)
-    local pos = sys.m_Data.position[1]
-    lu.assertNotNil(pos)
-    lu.assertEquals(pos.x, 1.23)
-    lu.assertEquals(pos.y, true)
-    lu.assertEquals(pos.z, 789)
-
-    local flag = sys.m_Data.flag[1]
-    lu.assertNotNil(flag)
-    lu.assertEquals(flag.value, 456)
-end
-
 local TestComponentDataArraySystem = class(ECS.ComponentSystem)
 ECS.TypeManager.RegisterSystemType("TestComponentDataArraySystem", TestComponentDataArraySystem)
 
-function TestComponentDataArraySystem:SystemAwake()
+function TestComponentDataArraySystem:OnAwake()
     self.group = self:GetComponentGroup({"DataForTestComponentDataArray3", "DataForTestComponentDataArray2"})
 end
-function TestComponentDataArraySystem:SystemUpdate(  )
-    print("TestComponentDataArraySystem:SystemUpdate")
+function TestComponentDataArraySystem:OnUpdate(  )
+    print("TestComponentDataArraySystem:OnUpdate")
 end
 function TestComponentSystem:TestComponentDataArray(  )
     ECS.TypeManager.RegisterType("DataForTestComponentDataArray1", {x=0, y=false, z=0})
@@ -180,10 +121,10 @@ end
 local TestEntityArraySystem = class(ECS.ComponentSystem)
 ECS.TypeManager.RegisterSystemType("TestEntityArraySystem", TestEntityArraySystem)
 
-function TestEntityArraySystem:SystemAwake()
+function TestEntityArraySystem:OnAwake()
     self.group = self:GetComponentGroup({"DataForTestEntityArray3", "DataForTestEntityArray2"})
 end
-function TestEntityArraySystem:SystemUpdate(  )
+function TestEntityArraySystem:OnUpdate(  )
 end
 function TestComponentSystem:TestEntityArray(  )
     ECS.TypeManager.RegisterType("DataForTestEntityArray1", {x=0, y=false, z=0})
@@ -208,10 +149,10 @@ end
 local TestRemoveEntitySystem = class(ECS.ComponentSystem)
 ECS.TypeManager.RegisterSystemType("TestRemoveEntitySystem", TestRemoveEntitySystem)
 
-function TestRemoveEntitySystem:SystemAwake(  )
+function TestRemoveEntitySystem:OnAwake(  )
     self.group = self:GetComponentGroup({"DataForTestRemoveEntity3", "DataForTestRemoveEntity2"})
 end
-function TestRemoveEntitySystem:SystemUpdate(  )
+function TestRemoveEntitySystem:OnUpdate(  )
 end
 function TestComponentSystem:TestRemoveEntity(  )
     ECS.TypeManager.RegisterType("DataForTestRemoveEntity1", {x=0, y=false, z=0})

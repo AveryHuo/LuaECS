@@ -1,8 +1,6 @@
 local ComponentSystem = class(ECS.BehaviourObject)
 
 function ComponentSystem:Init( world)
-    self.m_InjectedComponentGroups = {}
-    self.m_InjectFromEntityData = {}
     self.m_ComponentGroups = {}
     self.m_LastSystemVersion = nil
     self.m_EntityManager = nil
@@ -10,7 +8,6 @@ function ComponentSystem:Init( world)
     self.m_AlwaysUpdateSystem = false
     self.m_PreviouslyEnabled = false
     self.Enabled = true
-    self.inject_info_list = {}
 
     self.m_World = world
     self.m_EntityManager = world.entityManager
@@ -20,13 +17,11 @@ function ComponentSystem:Init( world)
 end
 
 function ComponentSystem:Awake( )
-    if self.SystemAwake then
-        self:SystemAwake()
+    if self.OnAwake then
+        self:OnAwake()
     end
 
     self.PostUpdateCommands = nil
-    ECS.ComponentSystemInjection.Inject(self, self.m_InjectedComponentGroups)
-    self:UpdateInjectedComponentGroups()
 end
 
 function ComponentSystem:Update(  )
@@ -36,9 +31,8 @@ function ComponentSystem:Update(  )
             self.m_PreviouslyEnabled = true
             self:OnStartRunning()
         end
-        self:UpdateInjectedComponentGroups()
-        if self.SystemUpdate then
-            self:SystemUpdate()
+        if self.OnUpdate then
+            self:OnUpdate()
         end
     elseif self.m_PreviouslyEnabled then
         self.m_PreviouslyEnabled = false
@@ -97,16 +91,6 @@ function ComponentSystem:GetComponentGroup( componentTypes )
     -- for (int i = 0;i != count;i++)
     --     AddReaderWriter(componentTypes[i])
     return group
-end
-
-function ComponentSystem:UpdateInjectedComponentGroups(  )
-    if not self.m_InjectedComponentGroups then return end
-
-    local pinnedSystemPtr = 0
-    for i,group in ipairs(self.m_InjectedComponentGroups) do
-        group:UpdateInjection(pinnedSystemPtr)
-    end
-    -- self.m_InjectFromEntityData:UpdateInjection(pinnedSystemPtr, self.m_EntityManager);
 end
 
 return ComponentSystem
