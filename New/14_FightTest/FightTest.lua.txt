@@ -1,0 +1,52 @@
+-- Tencent is pleased to support the open source community by making xLua available.
+-- Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+-- Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+-- http://opensource.org/licenses/MIT
+-- Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+package.path = 'C:/Test/TestLuaECS/TestLua/Assets/XLua/Examples/14_FightTest/?.lua;?/?.lua;../?.lua;../../?.lua;Tests/?.lua;'.. package.path;
+local ECS = require "ECS"
+local speed = 10
+local lightCpnt = nil
+
+local r = 0
+ECS.InitWorld("Default")
+
+function start()
+	print("ECS lua start...")
+	print("ecs injected object", hero_prefab.name)
+	print("ecs injected object", monster_prefab.name)
+
+	--组建Data
+	local moveData = require("Logic/MoveData")
+  	ECS.TypeManager.RegisterType("MoveData", moveData)
+	ECS.TypeManager.RegisterType("DataA", {})
+	ECS.TypeManager.RegisterType("DataB", {value = 7})
+	moveData.transform = self.transform
+	--moveData.hero_prefab = CS.UnityEngine.GameObject.Instantiate(hero_prefab,self.transform)
+	--moveData.monster_prefab = CS.UnityEngine.GameObject.Instantiate(monster_prefab,self.transform)
+	moveData.hero_prefab = hero_prefab
+	moveData.monster_prefab = monster_prefab
+	--数据装载到ArcheType
+	local archetype = ECS.World.Active.entityManager:CreateArchetype({"MoveData","DataA"})
+	local entities = ECS.World.Active.entityManager:CreateEntitiesByArcheType(archetype,32)
+	--
+
+
+	ECS.World.Active.entityManager:AddComponent(entities[20], "DataB")
+	----创建 System
+	ECS.World.Active:CreateSystem("MoveSystem")
+
+
+
+end
+
+function update()
+	ECS.Dispatcher:Update()
+end
+
+function ondestroy()
+    print("lua destroy")
+end
+
+

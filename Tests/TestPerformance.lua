@@ -24,4 +24,4 @@ function TestPerformance:TestMany(  )
 	end
 	local readCost = os.clock() - bt
 	print('ecs read write cost : ', readCost)
-end	
+end
