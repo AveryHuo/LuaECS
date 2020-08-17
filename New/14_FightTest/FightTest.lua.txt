@@ -29,11 +29,12 @@ function start()
 	moveData.monster_prefab = monster_prefab
 	--数据装载到ArcheType
 	local archetype = ECS.World.Active.entityManager:CreateArchetype({"MoveData","DataA"})
-	local entities = ECS.World.Active.entityManager:CreateEntitiesByArcheType(archetype,32)
+	local entities = ECS.World.Active.entityManager:CreateEntitiesByArcheType(archetype,8)
 	--
 
 
-	ECS.World.Active.entityManager:AddComponent(entities[20], "DataB")
+	ECS.World.Active.entityManager:AddComponent(entities[3], "DataB")
+	ECS.World.Active.entityManager:AddComponent(entities[4], "DataB")
 	----创建 System
 	ECS.World.Active:CreateSystem("MoveSystem")
 

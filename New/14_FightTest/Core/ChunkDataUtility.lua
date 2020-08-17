@@ -120,18 +120,46 @@ function ChunkDataUtility.GetComponentDataRO( chunk, index, indexInTypeArray )
     return chunk.Buffer + (offset + sizeOf * (index-1))
 end
 
-function ChunkDataUtility.GetComponentDataWithTypeName( chunk, componentName, index )
-    local data = chunk.Buffer[componentName][index]
-    if data ~= nil then
-        return data
-    else
-        -- 非entity类型的component，第一次使用时才进行取值，lazy init
-        local typeInfo = ECS.TypeManager.GetTypeInfoByName(componentName) 
-        data = ECS.ChunkDataUtility.DeepCopy(typeInfo.Prototype)
-        chunk.Buffer[componentName][index] = data
-        return data
+-- 获取chunk中的数据，注意chunk中可能存在空槽
+function ChunkDataUtility.GetDataFromChunk(chunk, componentName, index)
+    local data = nil
+    local existCount = 1
+    for i, v in pairs(chunk.Buffer[componentName]) do
+        if v then
+            if existCount == index then
+                data = chunk.Buffer[componentName][i]
+                break
+            else
+                existCount = existCount + 1
+            end
+        end
+    end
+    return data
+end
+
+-- 向chunk里设值
+function ChunkDataUtility.SetDataToChunk(chunk, componentName, index, data)
+    for i, v in pairs(chunk.Buffer[componentName]) do
+        if v and i >= index then
+            chunk.Buffer[componentName][i] = data
+            break
+        end
     end
 end
+
+function ChunkDataUtility.GetComponentDataWithTypeName( chunk, componentName, index )
+    if componentName ~= ECS.Entity.Name then
+        -- 非entity类型的component，第一次使用时才进行取值，lazy init
+        local typeInfo = ECS.TypeManager.GetTypeInfoByName(componentName)
+        local data = ECS.ChunkDataUtility.DeepCopy(typeInfo.Prototype)
+        ChunkDataUtility.SetDataToChunk(chunk, componentName, index, data)
+        return data
+    else
+        return ChunkDataUtility.GetDataFromChunk(chunk, componentName, index)
+    end
+end
+
+
 
 function ChunkDataUtility.GetComponentDataRW( chunk, index, indexInTypeArray, globalSystemVersion )
     local offset = chunk.Archetype.Offsets[indexInTypeArray]

@@ -168,12 +168,13 @@ function EntityDataManager:SetArchetype( typeMan, entity, archetype )
 
     -- 设置旧的Chunk空间，Entity归新的Archetype了，所以旧的EnityCount要减1
     oldArchetype.EntityCount = oldArchetype.EntityCount - 1
+    oldChunk.EntityCount = oldChunk.EntityCount - 1
     typeMan:SetChunkSize(oldChunk, oldChunk.UsedSize - oldArchetype.TotalLength)
 end
 
 function EntityDataManager:AllocateEntity( arch, chunk, allocateIdInChunk)
     local outputEntity = ECS.Entity.new()
-    outputEntity.version = self.GlobalSystemVersion
+    outputEntity.Version = self.GlobalSystemVersion
 
     chunk.Buffer[ECS.Entity.Name][allocateIdInChunk] = outputEntity
     if not self.entityData.ChunkData[outputEntity.Index] then
@@ -182,7 +183,7 @@ function EntityDataManager:AllocateEntity( arch, chunk, allocateIdInChunk)
     self.entityData.ChunkData[outputEntity.Index].IndexInChunk = allocateIdInChunk
     self.entityData.Archetype[outputEntity.Index] = arch
     self.entityData.ChunkData[outputEntity.Index].Chunk = chunk
-    self.entityData.Version[outputEntity.Index] = outputEntity.version
+    self.entityData.Version[outputEntity.Index] = outputEntity.Version
     return outputEntity
 end
 

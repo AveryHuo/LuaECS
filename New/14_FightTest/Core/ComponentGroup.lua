@@ -22,8 +22,7 @@ function ComponentGroup:ToComponentDataArray( com_type )
     end
 
     local iterator, length = self:GetComponentChunkIterator()
-    local indexInComponentGroup = self:GetIndexInComponentGroup(typeIndex)
-    local res = self:ToComponentDataArrayByIterator(iterator, indexInComponentGroup, length, com_type)
+    local res = self:ToComponentDataArrayByIterator(iterator, length, com_type)
     return res
 end
 
@@ -48,7 +47,7 @@ function ComponentGroup:ToEntityArray(  )
 end
 
 function ComponentGroup:GetComponentChunkIterator(  )
-    local length = self.groupData.FirstMatchingArchetype.Archetype.EntityCount
+    local length = ECS.ChunkIterator.CalculateLength(self.groupData.FirstMatchingArchetype)
     local iterator = ECS.ChunkIterator.new(self.groupData.FirstMatchingArchetype, self.entityDataManager.GlobalSystemVersion)
     return iterator, length
 end

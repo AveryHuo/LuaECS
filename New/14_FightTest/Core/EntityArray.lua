@@ -20,7 +20,7 @@ local get_fun = function ( t, index )
 	if index < 1 or index > t.Length then
 		return nil
 	end
-	if index < t.m_Cache.CachedBeginIndex or index >= t.m_Cache.CachedEndIndex then
+	if index < t.m_Cache.CachedBeginIndex or index > t.m_Cache.CachedEndIndex then
         t.m_Iterator:UpdateCache(index, t.m_Cache)
     end
     local data = ECS.ChunkDataUtility.GetComponentDataWithTypeName(t.m_Cache.CurChunk, ECS.Entity.Name, index-t.m_Cache.CachedBeginIndex)

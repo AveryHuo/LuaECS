@@ -96,9 +96,20 @@ end
 function ArchetypeManager:AllocateIntoChunk( archetype, chunk)
     -- 设置最新的
     self:SetChunkSize(chunk, chunk.UsedSize + archetype.TotalLength)
+    -- 默认分配索引号后一位
+    local allocatedIdx = chunk.EntityCount + 1
+    -- 在已有的索引下查找，如果有空位，由分配此空位索引
+    for i = 1, chunk.EntityCount do
+        if not chunk.Buffer[ECS.Entity.Name][i] then
+            print("chunk里的索引："..i.."，有空位")
+            allocatedIdx = i
+            break
+        end
+    end
+
     chunk.EntityCount = chunk.EntityCount + 1 --设置Entity个数
     chunk.Archetype.EntityCount = chunk.Archetype.EntityCount + 1
-    return chunk.EntityCount
+    return allocatedIdx
 end
 
 -- 增加chunk里存储大小，并做判断是否新建一个新的chunk
