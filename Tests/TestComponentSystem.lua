@@ -177,7 +177,7 @@ function TestComponentSystem:TestRemoveEntity(  )
     lu.assertEquals(entities[1], compData)
     lu.assertEquals(entities[1].value, compData.value)
     --delete entity
-    self.m_Manager:DestroyEntity(entity)
+     self.m_Manager:DestroyEntity(entity)
     local entities = sys.group:ToComponentDataArray("DataForTestRemoveEntity3")
     lu.assertNotNil(entities)
     lu.assertEquals(entities.Length, 0)
@@ -204,6 +204,7 @@ function TestComponentSystem:TestRemoveEntity(  )
     local compData = self.m_Manager:GetComponentData(entity2, "DataForTestRemoveEntity3")
     local correctMap = {}
     for i=1,entities.Length do
+        print(entities[i].value)
         correctMap[entities[i].value] = true
     end
     lu.assertTrue(correctMap[123])

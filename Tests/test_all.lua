@@ -1,6 +1,6 @@
 package.path = '?/?.lua;../?.lua;../../?.lua;Tests/?.lua;'.. package.path;
 local ECS = require "ECS"
-lu = require('Common.luaunit')
+lu = require('Base.luaunit')
 
 --在上级目录运行本文件即可：lua Tests/test_all.lua
 

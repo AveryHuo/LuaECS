@@ -1,9 +1,9 @@
 local ECS = ECS or {}
 
-local importer = require("Common.Importer")
+local importer = require("Base.Importer")
 importer.enable()
 
-importer.require("Common.BaseClass")
+importer.require("Base.BaseClass")
 
 --让本框架里的文件都有ECS这个全局变量
 local ECSEnv = {
@@ -17,37 +17,39 @@ setmetatable(ECSEnv, {
 	end,
 })
 
-ECS.Dispatcher = importer.require("Src.BehaviourDispatch", ECSEnv)
-ECS.TypeManager = importer.require("Src.TypeManager", ECSEnv)
-ECS.BehaviourObject = importer.require("Src.BehaviourObject", ECSEnv)
-ECS.World = importer.require("Src.World", ECSEnv)
-ECS.Entity = importer.require("Src.Entity", ECSEnv)
-ECS.EntityManager = importer.require("Src.EntityManager", ECSEnv)
-ECS.EntityDataManager = importer.require("Src.EntityDataManager", ECSEnv)
-ECS.ComponentGroup = importer.require("Src.ComponentGroup", ECSEnv)
-ECS.ComponentSystem = importer.require("Src.ComponentSystem", ECSEnv)
-ECS.ArchetypeManager = importer.require("Src.ArchetypeManager", ECSEnv)
-ECS.EntityGroupManager = importer.require("Src.EntityGroupManager", ECSEnv)
-ECS.ComponentType = importer.require("Src.ComponentType", ECSEnv)
-ECS.ComponentTypeInArchetype = importer.require("Src.ComponentTypeInArchetype", ECSEnv)
-ECS.SortingUtilities = importer.require("Common.SortingUtilities", ECSEnv)
-ECS.Chunk = importer.require("Src.Chunk", ECSEnv)
-ECS.UnsafeLinkedListNode = importer.require("Common.UnsafeLinkedListNode", ECSEnv)
-ECS.ChunkDataUtility = importer.require("Src.ChunkDataUtility", ECSEnv)
-ECS.ChunkIterator = importer.require("Src.ChunkIterator", ECSEnv)
-ECS.ComponentDataArray = importer.require("Src.ComponentDataArray", ECSEnv)
-ECS.EntityArray = importer.require("Src.EntityArray", ECSEnv)
+ECS.IdCounter = 0
+ECS.Dispatcher = importer.require("Core.BehaviourDispatch", ECSEnv)
+ECS.TypeManager = importer.require("Core.TypeManager", ECSEnv)
+ECS.BehaviourObject = importer.require("Core.BehaviourObject", ECSEnv)
+ECS.World = importer.require("Core.World", ECSEnv)
+ECS.Entity = importer.require("Core.Entity", ECSEnv)
+ECS.EntityManager = importer.require("Core.EntityManager", ECSEnv)
+ECS.EntityDataManager = importer.require("Core.EntityDataManager", ECSEnv)
+ECS.ComponentGroup = importer.require("Core.ComponentGroup", ECSEnv)
+ECS.ComponentSystem = importer.require("Core.ComponentSystem", ECSEnv)
+ECS.ArchetypeManager = importer.require("Core.ArchetypeManager", ECSEnv)
+ECS.EntityGroupManager = importer.require("Core.EntityGroupManager", ECSEnv)
+ECS.ComponentType = importer.require("Core.ComponentType", ECSEnv)
+ECS.SortingUtility = importer.require("Base.SortingUtility", ECSEnv)
+ECS.Chunk = importer.require("Core.Chunk", ECSEnv)
+ECS.LinkedList = importer.require("Base.LinkedList", ECSEnv)
+ECS.ChunkDataUtility = importer.require("Core.ChunkDataUtility", ECSEnv)
+ECS.ChunkIterator = importer.require("Core.ChunkIterator", ECSEnv)
+ECS.ComponentDataArray = importer.require("Core.ComponentDataArray", ECSEnv)
+ECS.EntityArray = importer.require("Core.EntityArray", ECSEnv)
+ECS.TableUtility = importer.require("Base.TableUtility", ECSEnv)
 
 local function InitWorld( worldName )
 	local world = ECS.World.new(worldName)
-	ECS.World.Active = World
+	ECS.World.Active = world
 	return world
 end
 
-ECS.Dispatcher:OnLoad()
 ECS.InitWorld = InitWorld
 
-ECS.Dispatcher:Update()
+--在这里注册所有System和Data
+importer.require("Logic/MoveSystem", ECSEnv)
+
 --为了不影响全局，这里要还原一下package.searchers
 importer.disable()
 
