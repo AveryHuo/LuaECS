@@ -21,7 +21,7 @@ local GenTypeArray = function( requiredComponents, count )
     local cachedArcheTypes = {}
     cachedArcheTypes[1] = ECS.ComponentType.Create(ECS.Entity.Name)
     for i=1,count do
-        ECS.SortingUtility.InsertSorted(cachedArcheTypes, i + 1, ECS.ComponentType.Create(requiredComponents[i]))
+        ECS.TableUtility.InsertSorted(cachedArcheTypes, i + 1, ECS.ComponentType.Create(requiredComponents[i]))
     end
     return cachedArcheTypes, count + 1
 end

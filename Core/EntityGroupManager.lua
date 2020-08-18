@@ -33,7 +33,7 @@ end
 function EntityGroupManager:CreateQuery( comp_names )
 	local requiredTypes = {}
     for i=1,#comp_names do
-        ECS.SortingUtility.InsertSorted(requiredTypes, i, ECS.ComponentType.Create(comp_names[i]))
+        ECS.TableUtility.InsertSorted(requiredTypes, i, ECS.ComponentType.Create(comp_names[i]))
     end
 
 	local filter = {}
