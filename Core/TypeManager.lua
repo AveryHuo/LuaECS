@@ -17,7 +17,7 @@ local CalculateFieldInfo, CalculateMemoryOrdering
 
 function TypeManager.BuildComponentType( name, type_desc )
 	local typeSize = 0
-	if type_desc.Length then
+	if type(type_desc) == "table" and type_desc.Length then
 		typeSize = type_desc.Length
 	end
 	local type_info = {

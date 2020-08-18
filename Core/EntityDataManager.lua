@@ -155,9 +155,11 @@ function EntityDataManager:SetArchetype( typeMan, entity, archetype )
 
     --转移数据
     for k,v in pairs(oldChunk.Buffer) do
-        chunk.Buffer[k][allocatedIndex] = oldChunk.Buffer[k][oldIndexInChunk]
+        if v[oldIndexInChunk] then
+            chunk.Buffer[k][allocatedIndex] = v[oldIndexInChunk]
+        end
         --转移后清空
-        oldChunk.Buffer[k][oldIndexInChunk] = nil
+        v[oldIndexInChunk] = nil
     end
 
     -- 将原的Buffer区赋值给当前的Buffer区域

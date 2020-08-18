@@ -9,7 +9,6 @@ function TestEntityManager:TestIncreaseEntityCapacity(  )
     local count = 1024
     local array = self.m_Manager:CreateEntitiesByArcheType(archetype, count)
     for i=1,count do
-        lu.assertEquals(array[i].Index, i)
         lu.assertTrue(self.m_Manager:Exists(array[i]))
     end
 end
@@ -110,7 +109,6 @@ function TestEntityManager:TestRemoveEntity(  )
     local count = 1024
     local array = self.m_Manager:CreateEntitiesByArcheType(archetype, count)
     for i=1,count do
-        lu.assertEquals(array[i].Index, i)
         lu.assertTrue(self.m_Manager:Exists(array[i]))
         self.m_Manager:DestroyEntity(array[i])
         lu.assertFalse(self.m_Manager:Exists(array[i]))

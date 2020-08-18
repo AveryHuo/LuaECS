@@ -13,6 +13,7 @@ end
 
 local LinkedList = {}
 
+
 function LinkedList:New()
     local new_linked_list = {head=nil, tail=nil}
     setmetatable(new_linked_list, self)
@@ -134,6 +135,17 @@ function LinkedList:Delete(value)
             node = node.next
         end
     end
+end
+
+function LinkedList:ToValueArray()
+    local ret = {}
+
+    local node = self.head
+    while node do
+        table.insert(ret,node.value)
+        node = node.next
+    end
+    return ret
 end
 
 function LinkedList:Print()

@@ -19,12 +19,12 @@ end
 
 function ChunkIterator:UpdateCache( index, cache )
     -- 找对应的chunk，遍历每一个archetype分类
+    local entityCount = 0
     cache.CurChunk = nil
     local globalIdx = index
     local match = self.FirstMatchingArchetype
     while match~=nil do
-        local entityCount = 0
-        local chunkList = ECS.LinkedList.ToChunkList(match.Archetype.ChunkList)
+        local chunkList = match.Archetype.ChunkList:ToValueArray()
         for i, v in pairs(chunkList) do
             if v then
                 cache.CachedBeginIndex = entityCount

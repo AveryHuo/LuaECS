@@ -62,7 +62,6 @@ function ArchetypeManager:CreateArchetypeInternal( types, count, groupManager )
 
     -- 创建chunk列表
     type.ChunkList = ECS.LinkedList()
-    ECS.LinkedList.InitializeList(type.ChunkList)
 
     -- types以":"分隔为KEY，添加此archetype
     local type_str = GetTypesStr(types, count)
@@ -84,7 +83,7 @@ function ArchetypeManager:ConstructChunk( archetype, chunk )
         chunk.Buffer[componentName] = {}
     end
     
-    archetype.ChunkList:Add(chunk.ChunkListNode)
+    archetype.ChunkList:Push(chunk)
     archetype.ChunkCount = archetype.ChunkCount+1
 end
 
@@ -120,8 +119,8 @@ function ArchetypeManager:SetChunkSize( chunk, newCount )
 
     if newCount == 0 then  -- 释放Chunk以清空
         chunk.Archetype.ChunkCount = chunk.Archetype.ChunkCount - 1
+        chunk.Archetype.ChunkList:Delete(chunk)
         chunk.Archetype = nil
-        chunk.ChunkListNode:Remove()
     elseif newCount >= capacity then -- Chunk已经满了
         chunk = self:CreateNewChunk(chunk.Archetype)
         -- 刷新最新的chunk使用情况，占用一个archetype的大小
@@ -137,9 +136,7 @@ function ArchetypeManager:GetChunk( archetype )
 
     -- 先从当前archetype的chunk列表拿
     if not archetype.ChunkList:IsEmpty() then
-        local lastChunkNode = archetype.ChunkList:Last()
-        local chunk = lastChunkNode:GetChunk()
-        return chunk
+        return archetype.ChunkList:GetLast()
     end
 
     --创建一个新的
