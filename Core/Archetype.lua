@@ -17,6 +17,7 @@ function Archetype:ctor(types, count, groupManager)
 
     -- 创建chunk列表
     self.ChunkList = ECS.LinkedList()
+    self.ChunkPool = ECS.LinkedList()
 end
 
 function Archetype:GetIndexInTypeArray( typeIndex )
@@ -41,6 +42,8 @@ function Archetype:SetChunkSize( chunk, newCount )
     local capacity = chunk.Capacity
 
     if newCount == 0 then  -- 释放Chunk以清空
+        self.ChunkPool:Push(chunk)
+
         chunk.Archetype.ChunkCount = chunk.Archetype.ChunkCount - 1
         chunk.Archetype.ChunkList:Delete(chunk)
         chunk.Archetype = nil
@@ -64,7 +67,7 @@ function Archetype:CreateNewChunk()
         Id = 0,
         Archetype = nil,--所属的archetype
         EntityCount = 0,--当前Entity的数量
-        Capacity = 16 * 1024, --固定容量
+        Capacity = 1600 * 1024, --固定容量
         UsedSize = 0
     }
 
@@ -107,10 +110,12 @@ function Archetype:ConstructChunk( chunk )
 end
 
 function Archetype:GetChunkFromArchetype(  )
-    --- TODO:尝试从池子拿一个chunk块
-
-    -- 初始化chunk，设置大小，指向，链表指针等信息
-    local newChunk = self:CreateNewChunk()
+    -- 尝试从池子拿一个chunk块
+    local newChunk = self.ChunkPool:Pop()
+    if not newChunk then
+        -- 初始化chunk，设置大小，指向，链表指针等信息
+        newChunk = self:CreateNewChunk()
+    end
 
     self:ConstructChunk(newChunk)
 

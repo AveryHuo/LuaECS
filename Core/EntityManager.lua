@@ -90,7 +90,7 @@ function EntityManager:AddComponentData( entity, componentTypeName, componentDat
 end
 
 function EntityManager:SetComponentData( entity, componentTypeName, componentData )
-    --做检查需要消耗多一倍时间
+    ----做检查需要消耗多一倍时间
     if not self.entityDataManager:AssertEntityHasComponent(entity, componentTypeName) then
         return
     end

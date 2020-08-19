@@ -2,7 +2,7 @@ local ECS = require "ECS"
 TestPerformance = class(require("TestBaseClass"))
 
 
-local testTimes = 20000
+local testTimes = 250000
 
 function TestPerformance:TestMany(  )
 	local bt = os.clock()
@@ -11,10 +11,12 @@ function TestPerformance:TestMany(  )
 	ECS.TypeManager.RegisterType("DataForTestPerformance3", {value=0})
 
 	local archetype = self.m_Manager:CreateArchetype({"DataForTestPerformance1", "DataForTestPerformance2", "DataForTestPerformance3"})
-	local entities = {}
-	for i=1,testTimes do
-		entities[i] = self.m_Manager:CreateEntityByArcheType(archetype)
-	end
+	--local entities = {}
+	--for i=1,testTimes do
+	--	entities[i] = self.m_Manager:CreateEntityByArcheType(archetype)
+	--end
+
+	local entities = self.m_Manager:CreateEntitiesByArcheType(archetype, testTimes)
 	local onWriteCost = os.clock() - bt
 	print('\necs create cost : ', onWriteCost)
 
@@ -26,6 +28,6 @@ function TestPerformance:TestMany(  )
 	local readCost = os.clock() - bt
 	print('ecs read write cost : ', readCost)
 
-	print("ECS.IdCounter",ECS.IdCounter)
+	print("ECS.IdCounter", ECS.IdCounter)
 end
 

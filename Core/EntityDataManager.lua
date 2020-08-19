@@ -63,7 +63,6 @@ function EntityDataManager:CreateEntities( archetypeManager, archetype, count )
         local allocatedIndex = archetypeManager:AllocateIntoChunk(archetype, chunk)
         -- 新建新的Entity到 chunk的Buffer缓存
         local entity = self:AllocateEntity(archetype, chunk, allocatedIndex)
-
         table.insert(entities,entity)
         count = count - 1
     end

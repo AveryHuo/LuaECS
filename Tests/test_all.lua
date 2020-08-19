@@ -61,7 +61,10 @@ for k,v in pairs(fileNames or {}) do
     	if dot_index ~= nil and is_lua_file then
 	    	local name_without_ex = string.sub(v, 1, dot_index-1)
 	    	print('test_all.lua init test file name : ', name_without_ex)
-			require(name_without_ex)
+			if name_without_ex == "TestPerformance" or name_without_ex == "TestBaseClass" then
+				require(name_without_ex)
+			end
+
 		end
 	end
 end
