@@ -107,7 +107,7 @@ function ArchetypeManager:SetChunkSize( chunk, newCount )
         chunk.Archetype.ChunkList:Delete(chunk)
         chunk.Archetype = nil
     elseif newCount >= capacity then -- Chunk已经满了
-        chunk = self:CreateNewChunk(chunk.Archetype)
+        chunk = self:GetChunkFromArchetype(chunk.Archetype)
         -- 刷新最新的chunk使用情况，占用一个archetype的大小
         chunk.UsedSize = chunk.Archetype.TotalLength
     else

@@ -44,8 +44,8 @@ end
 ECS.InitWorld = InitWorld
 
 --在这里注册所有System和Data
-importer.require("Logic/MoveSystem", ECSEnv)
-importer.require("Logic/TestSystem", ECSEnv)
+--importer.require("Logic/MoveSystem", ECSEnv)
+--importer.require("Logic/TestSystem", ECSEnv)
 
 --为了不影响全局，这里要还原一下package.searchers
 importer.disable()
