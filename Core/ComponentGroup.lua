@@ -79,7 +79,17 @@ function ComponentGroup:CreateArray( iterator, length, componentName )
             t.m_Iterator:Update(index, t.m_Cache)
         end
 
-        local data = t.m_Cache.CurChunk:GetData(t.m_ComponentTypeName, index-t.m_Cache.CachedBeginIndex)
+        local data = nil
+        data = t.m_Cache.CurChunk:GetData(t.m_ComponentTypeName, index-t.m_Cache.CachedBeginIndex)
+        --local countIdx = index-t.m_Cache.CachedBeginIndex
+        --for k, v in pairs(t.m_Cache.CurChunk.Buffer[t.m_ComponentTypeName]) do
+        --    countIdx = countIdx - 1
+        --    if countIdx == 0 then
+        --        data = t.m_Cache.CurChunk:GetData(t.m_ComponentTypeName, k)
+        --        break
+        --    end
+        --end
+
         return data
     end
 

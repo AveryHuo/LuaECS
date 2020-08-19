@@ -18,9 +18,12 @@ setmetatable(ECSEnv, {
 })
 
 ECS.IdCounter = 0
-ECS.Dispatcher = importer.require("Core.BehaviourDispatch", ECSEnv)
+ECS.Dispatcher = importer.require("Base.BehaviourDispatch", ECSEnv)
+ECS.BehaviourObject = importer.require("Base.BehaviourObject", ECSEnv)
+ECS.LinkedList = importer.require("Base.LinkedList", ECSEnv)
+ECS.TableUtility = importer.require("Base.TableUtility", ECSEnv)
+
 ECS.TypeManager = importer.require("Core.TypeManager", ECSEnv)
-ECS.BehaviourObject = importer.require("Core.BehaviourObject", ECSEnv)
 ECS.World = importer.require("Core.World", ECSEnv)
 ECS.Entity = importer.require("Core.Entity", ECSEnv)
 ECS.EntityManager = importer.require("Core.EntityManager", ECSEnv)
@@ -32,8 +35,7 @@ ECS.ArchetypeManager = importer.require("Core.ArchetypeManager", ECSEnv)
 ECS.EntityGroupManager = importer.require("Core.EntityGroupManager", ECSEnv)
 ECS.ComponentType = importer.require("Core.ComponentType", ECSEnv)
 
-ECS.LinkedList = importer.require("Base.LinkedList", ECSEnv)
-ECS.TableUtility = importer.require("Base.TableUtility", ECSEnv)
+
 
 local function InitWorld( worldName )
 	local world = ECS.World.new(worldName)
@@ -42,6 +44,14 @@ local function InitWorld( worldName )
 end
 
 ECS.InitWorld = InitWorld
+
+
+local rm_func = function(value)
+	if value == 5 then
+		return true
+	end
+	return false
+end
 
 --在这里注册所有System和Data
 --importer.require("Logic/MoveSystem", ECSEnv)

@@ -4,11 +4,11 @@ TestComponentSystem = class(require("TestBaseClass"))
 local TestSystem = class(ECS.ComponentSystem)
 ECS.TypeManager.RegisterSystemType("TestSystem", TestSystem)
 function TestSystem:OnAwake()
-    print("TestSystem awake")
+    --print("TestSystem awake")
 end
 
 function TestSystem:OnUpdate()
-    print("TestSystem update")
+    --print("TestSystem update")
 end
 
 function TestComponentSystem:TestCreate(  )
@@ -161,9 +161,9 @@ function TestComponentSystem:TestRemoveEntity(  )
 
     local sys = ECS.World.Active:GetOrCreateSystem("TestRemoveEntitySystem")
     lu.assertNotNil(sys.group)
-    local entities = sys.group:ToComponentDataArray("DataForTestRemoveEntity3")
-    lu.assertNotNil(entities)
-    lu.assertEquals(#entities, 0)
+    -- local entities = sys.group:ToComponentDataArray("DataForTestRemoveEntity3")
+    -- lu.assertNotNil(entities)
+    -- lu.assertEquals(#entities, 0)
 
     local archetype = self.m_Manager:CreateArchetype({"DataForTestRemoveEntity1", "DataForTestRemoveEntity2", "DataForTestRemoveEntity3"})
     local archetype2 = self.m_Manager:CreateArchetype({"DataForTestRemoveEntity2", "DataForTestRemoveEntity3"})
@@ -204,7 +204,6 @@ function TestComponentSystem:TestRemoveEntity(  )
     local compData = self.m_Manager:GetComponentData(entity2, "DataForTestRemoveEntity3")
     local correctMap = {}
     for i=1,entities.Length do
-        print(entities[i].value)
         correctMap[entities[i].value] = true
     end
     lu.assertTrue(correctMap[123])
@@ -217,7 +216,7 @@ function TestComponentSystem:TestRemoveEntity(  )
     lu.assertEquals(entities.Length, 1)
     lu.assertEquals(entities[1].value, 123)
 
-    --create and delete many
+    ----create and delete many
     local count = 1234
     local array = self.m_Manager:CreateEntitiesByArcheType(archetype, count)
     local entities = sys.group:ToComponentDataArray("DataForTestRemoveEntity3")

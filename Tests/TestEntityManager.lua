@@ -70,7 +70,7 @@ function TestEntityManager:TestEntityAddComponent(  )
     local archetype = self.m_Manager:CreateArchetype({test_compponent_name})
     local entity = self.m_Manager:CreateEntityByArcheType(archetype)
     lu.assertNotNil(entity)
-    
+
     self.m_Manager:AddComponent(entity, test_compponent_name_two)
     local comp_data = self.m_Manager:GetComponentData(entity, test_compponent_name_two)
     lu.assertEquals(comp_data.value, 0)
@@ -105,7 +105,7 @@ function TestEntityManager:TestRemoveEntity(  )
     lu.assertTrue(self.m_Manager:Exists(entity))
     self.m_Manager:DestroyEntity(entity)
     lu.assertFalse(self.m_Manager:Exists(entity))
-    
+
     local count = 1024
     local array = self.m_Manager:CreateEntitiesByArcheType(archetype, count)
     for i=1,count do

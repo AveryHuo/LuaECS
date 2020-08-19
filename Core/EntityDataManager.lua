@@ -5,7 +5,7 @@ local EntityData = {
 	Version=0, 
 	Archetype = nil,
 	Chunk = nil,
-	IndexInChunk = 0
+	IdInChunk = 0
 }
 -- 此Data类将存储所有的Chunk
 function EntityDataManager:ctor( )
@@ -43,16 +43,15 @@ function EntityDataManager:AssertEntityHasComponent( entity, com_type_name )
     return true
 end
 
-
 function EntityDataManager:GetComponentDataWithTypeNameRO( entity, componentTypeName )
     local entityChunk = self.entityData.ChunkData[entity.Index].Chunk
-    local entityIndexInChunk = self.entityData.ChunkData[entity.Index].IndexInChunk
+    local entityIndexInChunk = self.entityData.ChunkData[entity.Index].IdInChunk
     return entityChunk:GetData(componentTypeName, entityIndexInChunk)
 end
 
 function EntityDataManager:SetComponentDataWithTypeNameRW( entity, componentTypeName, componentData )
     local entityChunk = self.entityData.ChunkData[entity.Index].Chunk
-    local entityIndexInChunk = self.entityData.ChunkData[entity.Index].IndexInChunk
+    local entityIndexInChunk = self.entityData.ChunkData[entity.Index].IdInChunk
     entityChunk.Buffer[componentTypeName][entityIndexInChunk] = componentData
 end
 
@@ -64,6 +63,7 @@ function EntityDataManager:CreateEntities( archetypeManager, archetype, count )
         local allocatedIndex = archetypeManager:AllocateIntoChunk(archetype, chunk)
         -- 新建新的Entity到 chunk的Buffer缓存
         local entity = self:AllocateEntity(archetype, chunk, allocatedIndex)
+
         table.insert(entities,entity)
         count = count - 1
     end
@@ -124,16 +124,22 @@ function EntityDataManager:TryRemoveEntity( entity, archetypeManager )
     --将当前的Chunk里的此entity数据删除
     local entityIndex = entity.Index
     local chunk = self.entityData.ChunkData[entityIndex].Chunk
-    local indexInChunk = self.entityData.ChunkData[entityIndex].IndexInChunk
+    local indexInChunk = self.entityData.ChunkData[entityIndex].IdInChunk
     self.entityData.ChunkData[entityIndex].Chunk = nil
     self.entityData.Version[entityIndex] = self.entityData.Version[entityIndex] + 1
 
     --Archetype计数变更
     chunk.EntityCount = chunk.EntityCount - 1
     chunk.Archetype.EntityCount = chunk.Archetype.EntityCount - 1
+    --转移数据
+    for k,v in pairs(chunk.Buffer) do
+        if v[indexInChunk] then
+            v[indexInChunk] = nil
+        end
+    end
 
     --chunk大小设定
-    archetypeManager:SetChunkSize(chunk, chunk.UsedSize - chunk.Archetype.TotalLength)
+    chunk.Archetype:SetChunkSize(chunk, chunk.UsedSize - chunk.Archetype.TotalLength)
 end
 
 -- 为一个entity重新指定archetype
@@ -147,30 +153,29 @@ function EntityDataManager:SetArchetype( typeMan, entity, archetype )
 
     -- 获取旧的chunk
     local oldChunk = self.entityData.ChunkData[entity.Index].Chunk
-    local oldIndexInChunk = self.entityData.ChunkData[entity.Index].IndexInChunk
+    local oldIdInChunk = self.entityData.ChunkData[entity.Index].IdInChunk
 
     -- 申请一块archetype空间，并将新的archetype与此entity绑定
     local chunk = typeMan:GetChunk(archetype)
-    local allocatedIndex = typeMan:AllocateIntoChunk(archetype, chunk)
+    local allocatedId = typeMan:AllocateIntoChunk(archetype, chunk)
 
     --转移数据
     for k,v in pairs(oldChunk.Buffer) do
-        if v[oldIndexInChunk] then
-            chunk.Buffer[k][allocatedIndex] = v[oldIndexInChunk]
+        if v[oldIdInChunk] then
+            chunk.Buffer[k][allocatedId] = v[oldIdInChunk]
         end
-        --转移后清空
-        v[oldIndexInChunk] = nil
+        table.remove(v, oldIdInChunk)
     end
 
     -- 将原的Buffer区赋值给当前的Buffer区域
     self.entityData.Archetype[entity.Index] = archetype
     self.entityData.ChunkData[entity.Index].Chunk = chunk
-    self.entityData.ChunkData[entity.Index].IndexInChunk = allocatedIndex
+    self.entityData.ChunkData[entity.Index].IdInChunk = allocatedId
 
     -- 设置旧的Chunk空间，Entity归新的Archetype了，所以旧的EnityCount要减1
     oldArchetype.EntityCount = oldArchetype.EntityCount - 1
     oldChunk.EntityCount = oldChunk.EntityCount - 1
-    typeMan:SetChunkSize(oldChunk, oldChunk.UsedSize - oldArchetype.TotalLength)
+    oldArchetype:SetChunkSize(oldChunk, oldChunk.UsedSize - oldArchetype.TotalLength)
 end
 
 function EntityDataManager:AllocateEntity( arch, chunk, allocateIdInChunk)
@@ -181,7 +186,7 @@ function EntityDataManager:AllocateEntity( arch, chunk, allocateIdInChunk)
     if not self.entityData.ChunkData[outputEntity.Index] then
         self.entityData.ChunkData[outputEntity.Index] = {}
     end
-    self.entityData.ChunkData[outputEntity.Index].IndexInChunk = allocateIdInChunk
+    self.entityData.ChunkData[outputEntity.Index].IdInChunk = allocateIdInChunk
     self.entityData.Archetype[outputEntity.Index] = arch
     self.entityData.ChunkData[outputEntity.Index].Chunk = chunk
     self.entityData.Version[outputEntity.Index] = outputEntity.Version
