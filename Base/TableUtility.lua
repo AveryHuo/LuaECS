@@ -1,5 +1,13 @@
 local TableUtility = {}
 
+function TableUtility.InsertSorted( data, length, newValue )
+    while (length > 1 and newValue < data[length - 1]) do
+        data[length] = data[length - 1]
+        length = length - 1
+    end
+    data[length] = newValue
+end
+
 function TableUtility.Remove(obj, rm_func, to_sequence)
     if type(obj) ~= "table" or type(rm_func) ~= "function" then
         return

@@ -70,14 +70,6 @@ function ComponentSystem:ShouldRunSystem(  )
     return false
 end
 
-function ComponentSystem:Inject( inject_field_name, inject_info )
-    table.insert(self.inject_info_list, {inject_field_name, inject_info})
-end
-
-function ComponentSystem:GetInjectInfoList(  )
-    return self.inject_info_list
-end
-
 function ComponentSystem:OnStartRunning(  )
 end
 

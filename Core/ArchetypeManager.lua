@@ -41,33 +41,18 @@ end
 
 -- 内部：创建archetype
 function ArchetypeManager:CreateArchetypeInternal( types, count, groupManager )
-    local type = {}
-    type.TypesCount = count
-    type.Types = types
-    type.EntityCount = 0
-    type.ChunkCount = 0
-
-    type.TypesMap = {}
-    type.TotalLength = 0
-    for k,v in pairs(types) do
-        local typeName = ECS.TypeManager.GetTypeNameByIndex(v.TypeIndex)
-        local typeInfo = ECS.TypeManager.GetTypeInfoByIndex(v.TypeIndex)
-        type.TypesMap[typeName] = true
-        type.TotalLength = type.TotalLength + typeInfo.TypeSize
-    end
+    local type = ECS.Archetype.new(types, count, groupManager)
 
     -- 找到前面的archetype关联
     type.PrevArchetype = self.lastArcheType
     self.lastArcheType = type
-
-    -- 创建chunk列表
-    type.ChunkList = ECS.LinkedList()
 
     -- types以":"分隔为KEY，添加此archetype
     local type_str = GetTypesStr(types, count)
     self.archeTypes[type_str] = type
 
     groupManager:AddArchetypeIfMatching(type)
+
     return type
 end
 
@@ -140,28 +125,66 @@ function ArchetypeManager:GetChunk( archetype )
     end
 
     --创建一个新的
-    local newChunk = self:CreateNewChunk(archetype)
+    local newChunk = self:GetChunkFromArchetype(archetype)
     return newChunk
 end
 
 -- 创建一个Chunk
-function ArchetypeManager:CreateNewChunk( archetype )
-    local newChunk
-    --- 尝试从池子拿一个chunk块
-    --if not self.emptyChunkPool or self.emptyChunkPool:IsEmpty() then
-    --    -- 新建一个chunk
-    --    newChunk = ECS.Chunk.new()
-    --else
-    --    -- 从池子里拿一个,并将当前Chunk结点移出
-    --    newChunk = self.emptyChunkPool:Last()
-    --    -- 从池子链表中移出来
-    --    newChunk:Remove()
-    --    -- 获取真实chunk数据
-    --    newChunk = newChunk:GetChunk()
-    --end
+function ArchetypeManager:CreateNewChunk()
+    --- TODO:尝试从池子拿一个chunk块
 
     -- 初始化chunk，设置大小，指向，链表指针等信息
-    newChunk = ECS.Chunk.new()
+    local newChunk = {
+        Id = 0,
+        Archetype = nil,--所属的archetype
+        EntityCount = 0,--当前Entity的数量
+        Capacity = 16 * 1024, --固定容量
+        UsedSize = 0
+    }
+
+    newChunk.SetData = function(chunk, componentName, index, data)
+        for i, v in pairs(chunk.Buffer[componentName]) do
+            if v and i >= index then
+                chunk.Buffer[componentName][i] = data
+                break
+            end
+        end
+    end
+
+    newChunk.GetData = function( chunk, componentName, index )
+        local data = nil
+        local existCount = 1
+        for i, v in pairs(chunk.Buffer[componentName]) do
+            if v then
+                if existCount == index then
+                    data = chunk.Buffer[componentName][i]
+                    break
+                else
+                    existCount = existCount + 1
+                end
+            end
+        end
+
+        if data ~= nil then
+            return data
+        else
+            -- 非entity类型的component，第一次使用时才进行取值，lazy init
+            local typeInfo = ECS.TypeManager.GetTypeInfoByName(componentName)
+            data = ECS.TableUtility.DeepCopy(typeInfo.Prototype)
+            chunk:SetData(componentName, index, data)
+            return data
+        end
+    end
+
+    return newChunk
+end
+
+function ArchetypeManager:GetChunkFromArchetype( archetype )
+    --- TODO:尝试从池子拿一个chunk块
+
+    -- 初始化chunk，设置大小，指向，链表指针等信息
+    local newChunk = self:CreateNewChunk()
+
     self:ConstructChunk(archetype, newChunk)
 
     return newChunk

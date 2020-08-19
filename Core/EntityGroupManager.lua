@@ -89,7 +89,7 @@ function EntityGroupManager:AddArchetypeIfMatchingWithGroup( archetype, group )
     for component=1,group.RequiredComponentsCount do
         local typeComponentIndex = -1
         if (group.RequiredComponents[component].AccessModeType ~= ECS.ComponentType.AccessMode.Subtractive) then
-            typeComponentIndex = ECS.ChunkDataUtility.GetIndexInTypeArray(archetype, group.RequiredComponents[component].TypeIndex)
+            typeComponentIndex = archetype:GetIndexInTypeArray(group.RequiredComponents[component].TypeIndex)
             assert(-1~=typeComponentIndex, "it must not be -1")
         end
         match.IndexInArchetype[component] = typeComponentIndex

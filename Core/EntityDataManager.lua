@@ -20,7 +20,7 @@ function EntityDataManager:HasComponent( entity, comp_type_name, ignoreExistChec
 		return false
 	end
 	local archetype = self.entityData.Archetype[entity.Index]
-    return ECS.ChunkDataUtility.IsTypeNameInArchetype(archetype, comp_type_name)
+    return archetype:IsTypeNameInArchetype(comp_type_name)
 end
 
 function EntityDataManager:Exists( entity )
@@ -47,7 +47,7 @@ end
 function EntityDataManager:GetComponentDataWithTypeNameRO( entity, componentTypeName )
     local entityChunk = self.entityData.ChunkData[entity.Index].Chunk
     local entityIndexInChunk = self.entityData.ChunkData[entity.Index].IndexInChunk
-    return ECS.ChunkDataUtility.GetComponentDataWithTypeName(entityChunk, componentTypeName, entityIndexInChunk)
+    return entityChunk:GetData(componentTypeName, entityIndexInChunk)
 end
 
 function EntityDataManager:SetComponentDataWithTypeNameRW( entity, componentTypeName, componentData )
