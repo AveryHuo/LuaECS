@@ -90,6 +90,39 @@ function Archetype:CreateNewChunk()
         end
     end
 
+    newChunk.RemoveEntity = function(chunk, entity)
+        --删除Chunk里的此entity相关的所有buffer数据
+        for k,v in pairs(chunk.Buffer) do
+            -- 由于删除后的IndexInChunk实际已经对不上了，table将自动变更索引，因此将后续的buffer里的索引位标识手动-1
+            if k == ECS.Entity.Name then
+                for i, cur in pairs(v) do
+                    if i > entity.IndexInChunk then
+                        cur.IndexInChunk = cur.IndexInChunk -1
+                    end
+                end
+            end
+            -- 删除此项
+            table.remove(v, entity.IndexInChunk)
+        end
+    end
+
+    newChunk.MoveEntity = function(chunk, toChunk, entity, pos)
+        --删除Chunk里的此entity相关的所有buffer数据
+        for k,v in pairs(chunk.Buffer) do
+            toChunk.Buffer[k][pos] = v[entity.IndexInChunk]
+            -- 由于删除后的IndexInChunk实际已经对不上了，table将自动变更索引，因此将后续的buffer里的索引位标识手动-1
+            if k == ECS.Entity.Name then
+                for i, cur in pairs(v) do
+                    if i > entity.IndexInChunk then
+                        cur.IndexInChunk = cur.IndexInChunk -1
+                    end
+                end
+            end
+            -- 删除此项
+            table.remove(v, entity.IndexInChunk)
+        end
+    end
+
     return newChunk
 end
 
