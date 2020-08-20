@@ -6,27 +6,27 @@ function ComponentGroup:ctor( groupData, entityDataManager )
     self.entityDataManager = entityDataManager
 end
 
--- 创建compnent数据的迭代器
-function ComponentGroup:CreateIterator( match, globalSystemVersion )
-    local iterator = {
-        FirstMatchingArchetype = match,
-        CurrentMatchingArchetype = match,
-        IndexInComponentGroup = -1,
-        CurrentChunk = nil,
-        GlobalSystemVersion = globalSystemVersion
+function ComponentGroup:CreateArray( groupData, length, componentName )
+    assert(groupData~=nil, "groupData should not be nil!")
+    assert(length~=nil, "length should not be nil!")
+    assert(componentName~=nil, "componentName should not be nil!")
+    -- CachedBeginIndex，CachedEndIndex 分别记录当前Chunk的起始和结尾索引
+    local array = {
+        m_GroupData=groupData,
+        Length=length,
+        m_ComponentTypeName=componentName,
+        m_Data = {},
+        m_Cache = {
+            CachedPtr=nil, CachedBeginIndex=0, CachedEndIndex=0, CachedSizeOf=0, IsWriting=false
+        },
     }
 
-    iterator.Clone = function( iterator )
-        assert(iterator~=nil, "iterator should not be nil!")
-        return self:CreateIterator(iterator.FirstMatchingArchetype, iterator.GlobalSystemVersion)
-    end
-
-    iterator.Update = function(iterator, index, cache )
+    array.Update = function(array, index, cache )
         -- 找对应的chunk，遍历每一个archetype分类
         local entityCount = 0
         cache.CurChunk = nil
         local globalIdx = index
-        local match = iterator.FirstMatchingArchetype
+        local match = array.m_GroupData.FirstMatchingArchetype
         while match~=nil do
             local chunkList = match.Archetype.ChunkList:ToValueArray()
             for i, v in pairs(chunkList) do
@@ -53,43 +53,16 @@ function ComponentGroup:CreateIterator( match, globalSystemVersion )
         end
     end
 
-    return iterator
-end
-
-function ComponentGroup:CreateArray( iterator, length, componentName )
-    assert(iterator~=nil, "iterator should not be nil!")
-    assert(length~=nil, "length should not be nil!")
-    assert(componentName~=nil, "componentName should not be nil!")
-    -- CachedBeginIndex，CachedEndIndex 分别记录当前Chunk的起始和结尾索引
-    local array = {
-        m_Iterator=iterator,
-        Length=length,
-        m_ComponentTypeName=componentName,
-        m_Data = {},
-        m_Cache = {
-            CachedPtr=nil, CachedBeginIndex=0, CachedEndIndex=0, CachedSizeOf=0, IsWriting=false
-        },
-    }
-
     local get_fun = function ( t, index )
         if index < 1 or index > t.Length then
             return nil
         end
-        if index < t.m_Cache.CachedBeginIndex or index >= t.m_Cache.CachedEndIndex then
-            t.m_Iterator:Update(index, t.m_Cache)
-        end
+        --if index < t.m_Cache.CachedBeginIndex or index >= t.m_Cache.CachedEndIndex then
+            t:Update(index, t.m_Cache)
+        --end
 
         local data = nil
         data = t.m_Cache.CurChunk:GetData(t.m_ComponentTypeName, index-t.m_Cache.CachedBeginIndex)
-        --local countIdx = index-t.m_Cache.CachedBeginIndex
-        --for k, v in pairs(t.m_Cache.CurChunk.Buffer[t.m_ComponentTypeName]) do
-        --    countIdx = countIdx - 1
-        --    if countIdx == 0 then
-        --        data = t.m_Cache.CurChunk:GetData(t.m_ComponentTypeName, k)
-        --        break
-        --    end
-        --end
-
         return data
     end
 
@@ -99,7 +72,7 @@ function ComponentGroup:CreateArray( iterator, length, componentName )
             return
         end
         if index < t.m_Cache.CachedBeginIndex or index >= t.m_Cache.CachedEndIndex then
-            t.m_Iterator:Update(index, t.m_Cache)
+            t:Update(index, t.m_Cache)
         end
         t.m_Cache.CurChunk:SetData(t.m_ComponentTypeName, index-t.m_Cache.CachedBeginIndex,value)
     end
@@ -114,8 +87,7 @@ function ComponentGroup:CreateArray( iterator, length, componentName )
 end
 
 function ComponentGroup:ToComponentDataArray( com_type )
-    local iterator = self:GetComponentChunkIterator()
-    local data = self:CreateArray(iterator, self:GetEntityCount(), com_type)
+    local data = self:CreateArray(self.groupData, self:GetEntityCount(), com_type)
     return data
 end
 
@@ -128,14 +100,8 @@ function ComponentGroup:GetIndexInComponentGroup( componentType )
 end
 
 function ComponentGroup:ToEntityArray(  )
-    local iterator = self:GetComponentChunkIterator()
-    local data = self:CreateArray(iterator, self:GetEntityCount(), ECS.Entity.Name)
+    local data = self:CreateArray(self.groupData, self:GetEntityCount(), ECS.Entity.Name)
     return data
-end
-
-function ComponentGroup:GetComponentChunkIterator(  )
-    local iterator = self:CreateIterator(self.groupData.FirstMatchingArchetype, self.entityDataManager.GlobalSystemVersion)
-    return iterator
 end
 
 

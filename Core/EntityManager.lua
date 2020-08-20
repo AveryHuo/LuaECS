@@ -12,7 +12,6 @@ function EntityManager:Awake()
 	self.entityDataManager = ECS.EntityDataManager.new()
 	self.archetypeManager = ECS.ArchetypeManager.new()
 	self.groupManager = ECS.EntityGroupManager.new()
-	self.cachedArcheTypes = {}
 end
 
 function EntityManager:GetArchetypeManager(  )
@@ -45,9 +44,8 @@ end
 function EntityManager:CreateArchetype( types )
     local typeArray,typeCount = ECS.ArchetypeManager.GenTypeArray(types, #types)
 
-    self.cachedArcheTypes = typeArray
     local entityArchetype = {}
-    entityArchetype.Archetype = self.archetypeManager:GetOrCreateArchetype(self.cachedArcheTypes, typeCount, self.groupManager)
+    entityArchetype.Archetype = self.archetypeManager:GetOrCreateArchetype(typeArray, typeCount, self.groupManager)
     return entityArchetype
 end
 
@@ -70,8 +68,7 @@ function EntityManager:Instantiate( srcEntity )
 end
 
 function EntityManager:AddComponent( entity, comp_type_name )
-    self.entityDataManager:AddComponent(entity, comp_type_name, self.archetypeManager,  self.groupManager,
-        self.cachedArcheTypes)
+    self.entityDataManager:AddComponent(entity, comp_type_name, self.archetypeManager,  self.groupManager)
 end
 
 function EntityManager:RemoveComponent( entity, comp_type_name )
@@ -80,7 +77,7 @@ function EntityManager:RemoveComponent( entity, comp_type_name )
 
     local archetype = self.entityDataManager:GetArchetype(entity)
     if (archetype.SystemStateCleanupComplete) then
-        self.entityDataManager:TryRemoveEntity(entity, 1, self.archetypeManager,  self.groupManager, self.cachedArcheTypes)
+        self.entityDataManager:TryRemoveEntity(entity)
     end
 end
 
@@ -126,7 +123,7 @@ end
 
 function EntityManager:DestroyEntity( entity )
     if self.entityDataManager:Exists(entity) then
-        self.entityDataManager:TryRemoveEntity(entity, self.archetypeManager)
+        self.entityDataManager:TryRemoveEntity(entity)
     end
 end
 

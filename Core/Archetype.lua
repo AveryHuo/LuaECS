@@ -42,11 +42,13 @@ function Archetype:SetChunkSize( chunk, newCount )
     local capacity = chunk.Capacity
 
     if newCount == 0 then  -- 释放Chunk以清空
+        print("chunk recycle")
         self.ChunkPool:Push(chunk)
 
         chunk.Archetype.ChunkCount = chunk.Archetype.ChunkCount - 1
         chunk.Archetype.ChunkList:Delete(chunk)
         chunk.Archetype = nil
+        chunk.UsedSize = newCount
     elseif newCount >= capacity then -- Chunk已经满了
         chunk = self:GetChunkFromArchetype()
         -- 刷新最新的chunk使用情况，占用一个archetype的大小
@@ -59,15 +61,13 @@ end
 
 -- 创建一个Chunk
 function Archetype:CreateNewChunk()
-    --- TODO:尝试从池子拿一个chunk块
-
     ECS.IdCounter = ECS.IdCounter + 1
     -- 初始化chunk，设置大小，指向，链表指针等信息
     local newChunk = {
         Id = 0,
         Archetype = nil,--所属的archetype
         EntityCount = 0,--当前Entity的数量
-        Capacity = 1600 * 1024, --固定容量
+        Capacity = 16 * 1024, --固定容量
         UsedSize = 0
     }
 

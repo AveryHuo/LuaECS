@@ -19,11 +19,11 @@ ArchetypeManager.GetTypesStr = GetTypesStr
 -- 生成类型数组
 local GenTypeArray = function( requiredComponents, count )
     local cachedArcheTypes = {}
-    cachedArcheTypes[1] = ECS.ComponentType.Create(ECS.Entity.Name)
+    table.insert(cachedArcheTypes,ECS.ComponentType.Create(ECS.Entity.Name))
     for i=1,count do
-        ECS.TableUtility.InsertSorted(cachedArcheTypes, i + 1, ECS.ComponentType.Create(requiredComponents[i]))
+        table.insert(cachedArcheTypes,ECS.ComponentType.Create(requiredComponents[i]))
     end
-    return cachedArcheTypes, count + 1
+    return cachedArcheTypes, #cachedArcheTypes
 end
 ArchetypeManager.GenTypeArray = GenTypeArray
 
@@ -76,7 +76,6 @@ end
 
 -- 从archetype中拿一个chunk
 function ArchetypeManager:GetChunk( archetype )
-
     -- 先从当前archetype的chunk列表拿
     if not archetype.ChunkList:IsEmpty() then
         return archetype.ChunkList:GetLast()
