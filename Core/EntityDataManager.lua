@@ -42,12 +42,12 @@ function EntityDataManager:AssertEntityHasComponent( entity, com_type_name )
     return true
 end
 
-function EntityDataManager:GetComponentDataWithTypeNameRO( entity, componentTypeName )
+function EntityDataManager:GetComponentDataWithTypeName( entity, componentTypeName )
     local entityChunk = self.entityData.ChunkData[entity.Id].Chunk
     return entityChunk:GetData(componentTypeName, entity.IndexInChunk)
 end
 
-function EntityDataManager:SetComponentDataWithTypeNameRW( entity, componentTypeName, componentData )
+function EntityDataManager:SetComponentDataWithTypeName( entity, componentTypeName, componentData )
     local entityChunk = self.entityData.ChunkData[entity.Id].Chunk
     entityChunk:SetData(componentTypeName, entity.IndexInChunk, componentData)
 end
@@ -156,7 +156,7 @@ function EntityDataManager:SetArchetype( typeMan, entity, archetype )
 end
 
 function EntityDataManager:AllocateEntity( arch, chunk, allocateIdxInChunk)
-    local outputEntity = ECS.Entity.new()
+    local outputEntity = ECS.Entity.New()
     outputEntity.Version = self.GlobalSystemVersion
 
     chunk.Buffer[ECS.Entity.Name][allocateIdxInChunk] = outputEntity

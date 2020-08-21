@@ -50,64 +50,85 @@ function EntityManager:CreateArchetype( types )
 end
 
 function EntityManager:Exists( entity )
+    if entity.IndexInChunk < 0 then
+        return false
+    end
     return self.entityDataManager:Exists(entity)
 end
 
 function EntityManager:HasComponent( entity, comp_type_name )
+    if entity.IndexInChunk < 0 then
+        return false
+    end
+
     return self.entityDataManager:HasComponent(entity, comp_type_name)
 end
 
-function EntityManager:Instantiate( srcEntity )
-	-- self:BeforeStructuralChange()
-    if not self.entityDataManager:Exists(srcEntity) then
-        assert(false, "srcEntity is not a valid entity")
-    end
-
-    self.entityDataManager:InstantiateEntities(self.archetypeManager,  self.groupManager, srcEntity, outputEntities,
-        count, self.cachedArcheTypes)
-end
-
 function EntityManager:AddComponent( entity, comp_type_name )
+    if entity.IndexInChunk < 0 then
+        return
+    end
     self.entityDataManager:AddComponent(entity, comp_type_name, self.archetypeManager,  self.groupManager)
 end
 
 function EntityManager:RemoveComponent( entity, comp_type_name )
+    if entity.IndexInChunk < 0 then
+        return
+    end
+
     self.entityDataManager:AssertEntityHasComponent(entity, comp_type_name)
     self.entityDataManager:RemoveComponent(entity, comp_type_name, self.archetypeManager, self.groupManager)
 end
 
 function EntityManager:AddComponentData( entity, componentTypeName, componentData )
+    if entity.IndexInChunk < 0 then
+        return
+    end
 	self:AddComponent(entity, componentTypeName)
     self:SetComponentData(entity, componentTypeName, componentData)
 end
 
 function EntityManager:SetComponentData( entity, componentTypeName, componentData )
     ----做检查需要消耗多一倍时间
-    if not self.entityDataManager:AssertEntityHasComponent(entity, componentTypeName) then
+    --if not self.entityDataManager:AssertEntityHasComponent(entity, componentTypeName) then
+    --    return
+    --end
+
+    if entity.IndexInChunk < 0 then
         return
     end
-    self.entityDataManager:SetComponentDataWithTypeNameRW(entity, componentTypeName, componentData)
+    self.entityDataManager:SetComponentDataWithTypeName(entity, componentTypeName, componentData)
 end
 
 function EntityManager:GetComponentData( entity, componentTypeName )
-    if not self.entityDataManager:AssertEntityHasComponent(entity, componentTypeName) then
+    --if not self.entityDataManager:AssertEntityHasComponent(entity, componentTypeName) then
+    --    return nil
+    --end
+
+    if entity.IndexInChunk < 0 then
         return nil
     end
-    return self.entityDataManager:GetComponentDataWithTypeNameRO(entity, componentTypeName)
+    return self.entityDataManager:GetComponentDataWithTypeName(entity, componentTypeName)
 end
 
 function EntityManager:GetComponentTypes( entity )
-    self.entityDataManager:Exists(entity)
+    if entity.IndexInChunk < 0 then
+        return nil
+    end
+
     local archetype = self.entityDataManager:GetArchetype(entity)
     local components = {}
     for i=2, archetype.TypesCount do
-        components[i - 1] = archetype.Types[i].ToComponentType()
+        components[i - 1] = archetype.Types[i].Name
     end
     return components
 end
 
 function EntityManager:GetComponentCount( entity )
-    self.entityDataManager:Exists(entity)
+    if entity.IndexInChunk < 0 then
+        return nil
+    end
+
     local archetype = self.entityDataManager:GetArchetype(entity)
     return archetype.TypesCount - 1
 end
@@ -117,6 +138,9 @@ function EntityManager:CreateComponentGroup( requiredComponents )
 end
 
 function EntityManager:DestroyEntity( entity )
+    if entity.IndexInChunk < 0 then
+        return
+    end
     if self.entityDataManager:Exists(entity) then
         self.entityDataManager:TryRemoveEntity(entity)
     end

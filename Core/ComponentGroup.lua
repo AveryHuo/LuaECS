@@ -25,7 +25,7 @@ function ComponentGroup:CreateComponentDataArray( entities, entityDataManager,  
             return nil
         end
 
-        local data = t.DataManager:GetComponentDataWithTypeNameRO(t.Entities[index], t.ComponentTypeName)
+        local data = t.DataManager:GetComponentDataWithTypeName(t.Entities[index], t.ComponentTypeName)
         return data
     end
 
@@ -39,7 +39,7 @@ function ComponentGroup:CreateComponentDataArray( entities, entityDataManager,  
             return nil
         end
 
-        t.DataManager:SetComponentDataWithTypeNameRW(t.Entities[index], t.ComponentTypeName, value)
+        t.DataManager:SetComponentDataWithTypeName(t.Entities[index], t.ComponentTypeName, value)
     end
 
     local meta_tbl = {
@@ -52,7 +52,8 @@ function ComponentGroup:CreateComponentDataArray( entities, entityDataManager,  
 end
 
 function ComponentGroup:ToComponentDataArray( com_type )
-    local data = self:CreateComponentDataArray(self.groupData, self:GetEntityCount(), com_type)
+    local entities = self:ToEntityArray()
+    local data = self:CreateComponentDataArray(entities, self.entityDataManager , com_type)
     return data
 end
 

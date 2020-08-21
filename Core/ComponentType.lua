@@ -20,6 +20,7 @@ end
 function ComponentType.FromTypeIndex( typeIndex )
 	local ct = ECS.TypeManager.GetTypeInfoByIndex(typeIndex)
     local type = ComponentType.new()
+	type.Name = ct.Name
     type.TypeIndex = typeIndex
     type.AccessModeType = ComponentType.AccessMode.ReadWrite
     type.BufferCapacity = ct.BufferCapacity
