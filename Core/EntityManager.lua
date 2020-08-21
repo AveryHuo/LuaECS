@@ -74,11 +74,6 @@ end
 function EntityManager:RemoveComponent( entity, comp_type_name )
     self.entityDataManager:AssertEntityHasComponent(entity, comp_type_name)
     self.entityDataManager:RemoveComponent(entity, comp_type_name, self.archetypeManager, self.groupManager)
-
-    local archetype = self.entityDataManager:GetArchetype(entity)
-    if (archetype.SystemStateCleanupComplete) then
-        self.entityDataManager:TryRemoveEntity(entity)
-    end
 end
 
 function EntityManager:AddComponentData( entity, componentTypeName, componentData )

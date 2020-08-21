@@ -6,63 +6,26 @@ function ComponentGroup:ctor( groupData, entityDataManager )
     self.entityDataManager = entityDataManager
 end
 
-function ComponentGroup:CreateArray( groupData, length, componentName )
-    assert(groupData~=nil, "groupData should not be nil!")
-    assert(length~=nil, "length should not be nil!")
+function ComponentGroup:CreateComponentDataArray( entities, entityDataManager,  componentName )
     assert(componentName~=nil, "componentName should not be nil!")
     -- CachedBeginIndex，CachedEndIndex 分别记录当前Chunk的起始和结尾索引
     local array = {
-        m_GroupData=groupData,
-        Length=length,
-        m_ComponentTypeName=componentName,
-        m_Data = {},
-        m_Cache = {
-            CachedPtr=nil, CachedBeginIndex=0, CachedEndIndex=0, CachedSizeOf=0, IsWriting=false
-        },
+        Entities = entities,
+        DataManager = entityDataManager,
+        Length = entities.Length,
+        ComponentTypeName=componentName,
     }
-
-    array.Update = function(array, index, cache )
-        -- 找对应的chunk，遍历每一个archetype分类
-        local entityCount = 0
-        cache.CurChunk = nil
-        local globalIdx = index
-        local match = array.m_GroupData.FirstMatchingArchetype
-        while match~=nil do
-            local chunkList = match.Archetype.ChunkList:ToValueArray()
-            for i, v in pairs(chunkList) do
-                if v then
-                    cache.CachedBeginIndex = entityCount
-                    entityCount = entityCount + v.EntityCount
-                    cache.CachedEndIndex = entityCount
-                    -- 如果当前在范围内，表示找到对应的chunk了
-                    if globalIdx <= entityCount then
-                        cache.CurChunk = v
-                        break
-                    else
-                        --当前的索引仍大于当前已找到的entity总数，减掉后继续
-                    end
-                end
-            end
-            --已经找到了，就跳出
-            if cache.CurChunk then
-                break
-            end
-            --找下一个Archetype,索引号减掉当前archetype已经找过的所有entity数
-            globalIdx = globalIdx - entityCount
-            match = match.Next
-        end
-    end
 
     local get_fun = function ( t, index )
         if index < 1 or index > t.Length then
             return nil
         end
-        --if index < t.m_Cache.CachedBeginIndex or index >= t.m_Cache.CachedEndIndex then
-            t:Update(index, t.m_Cache)
-        --end
 
-        local data = nil
-        data = t.m_Cache.CurChunk:GetData(t.m_ComponentTypeName, index-t.m_Cache.CachedBeginIndex)
+        if not t.Entities[index] then
+            return nil
+        end
+
+        local data = t.DataManager:GetComponentDataWithTypeNameRO(t.Entities[index], t.ComponentTypeName)
         return data
     end
 
@@ -71,10 +34,12 @@ function ComponentGroup:CreateArray( groupData, length, componentName )
             print("Entity type setting is useless!")
             return
         end
-        if index < t.m_Cache.CachedBeginIndex or index >= t.m_Cache.CachedEndIndex then
-            t:Update(index, t.m_Cache)
+
+        if not t.Entities[index] then
+            return nil
         end
-        t.m_Cache.CurChunk:SetData(t.m_ComponentTypeName, index-t.m_Cache.CachedBeginIndex,value)
+
+        t.DataManager:SetComponentDataWithTypeNameRW(t.Entities[index], t.ComponentTypeName, value)
     end
 
     local meta_tbl = {
@@ -87,7 +52,7 @@ function ComponentGroup:CreateArray( groupData, length, componentName )
 end
 
 function ComponentGroup:ToComponentDataArray( com_type )
-    local data = self:CreateArray(self.groupData, self:GetEntityCount(), com_type)
+    local data = self:CreateComponentDataArray(self.groupData, self:GetEntityCount(), com_type)
     return data
 end
 
@@ -100,8 +65,28 @@ function ComponentGroup:GetIndexInComponentGroup( componentType )
 end
 
 function ComponentGroup:ToEntityArray(  )
-    local data = self:CreateArray(self.groupData, self:GetEntityCount(), ECS.Entity.Name)
-    return data
+    local archetype = self.groupData.FirstMatchingArchetype
+    if not archetype then
+        return nil
+    end
+
+    -- 遍历当前group下所有的archetype中的chunk。 取出entity装载
+    local length = 0
+    local entities = {}
+    local match = archetype
+    while match ~= nil do
+        length = length + match.Archetype.EntityCount
+        for _, v in pairs(match.Archetype.ChunkList:ToValueArray()) do
+            for _,entity in pairs(v.Buffer[ECS.Entity.Name]) do
+                table.insert(entities, entity)
+            end
+        end
+
+        match = match.Next
+    end
+    entities.Length = length
+
+    return entities
 end
 
 

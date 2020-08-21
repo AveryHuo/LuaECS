@@ -7,7 +7,7 @@ ECS.IncreateId = 0
 function Entity:ctor(  )
 	ECS.IncreateId = ECS.IncreateId + 1
 
-	self.Index = ECS.IncreateId
+	self.Id = ECS.IncreateId
 	self.IndexInChunk = 0
 	self.Version = 0
 end
