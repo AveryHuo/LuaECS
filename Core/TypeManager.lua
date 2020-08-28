@@ -13,8 +13,6 @@ TypeManager.s_Systems = {}
 TypeManager.s_Count = 0
 TypeManager.StaticTypeLookup = {}
 
-local CalculateFieldInfo, CalculateMemoryOrdering
-
 function TypeManager.BuildComponentType( name, type_desc )
 	local typeSize = 0
 	if type(type_desc) == "table" and type_desc.Length then
@@ -24,7 +22,6 @@ function TypeManager.BuildComponentType( name, type_desc )
 		Name = name,
 		Prototype = type_desc,
 		TypeIndex = TypeManager.s_Count,
-		BufferCapacity = -1,
 		TypeSize = typeSize,
 	}
 	return type_info
@@ -48,40 +45,6 @@ function TypeManager:CleanAllTypes()
 	TypeManager.StaticTypeLookup = {}
 end
 
-CalculateFieldInfo = function ( type_desc )
-	local field_names = {}
-	for k,v in pairs(type_desc) do
-		assert(type(k)=="string", "key type must be string!")
-		table.insert(field_names, k)
-	end
-	table.sort(field_names)
-	--Cat_Todo : 考虑字节对齐，提高读取性能
-	local sum_size = 0
-	local field_info_list = {}
-	for i,v in ipairs(field_names) do
-		local field_type = type_desc[v]
-		local field_desc_type = type(field_type)
-		if field_desc_type == "string" then
-			local field_size = ECS.CoreHelper.GetNativeTypeSize(field_type)
-			table.insert(field_info_list, {FieldName=v, FieldType=field_type, FieldSize=field_size, Offset=sum_size})
-			sum_size = sum_size + field_size
-		elseif field_desc_type == "table" then
-			local out_field_info_list, out_field_size = CalculateFieldInfo(field_type)
-			table.insert(field_info_list, {FieldName=v, FieldType="table", FieldSize=out_field_size, Offset=sum_size, ChildFieldList=out_field_info_list})
-			sum_size = sum_size + out_field_size
-		else
-			assert(false, "wrong type : "..field_desc_type)
-		end
-	end
-	return field_info_list, sum_size
-end
-
-CalculateMemoryOrdering = function ( type_name )
-	if type_name == ECS.Entity.Name then
-		return 0
-	end
-	return 1
-end
 
 function TypeManager.GetTypeIndexByName( type_name )
 	assert(type_name and type_name ~= "", "wrong type name!")

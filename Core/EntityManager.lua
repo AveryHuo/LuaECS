@@ -8,7 +8,7 @@ function EntityManager:Init()
 end
 
 function EntityManager:Awake()
-    ECS.TypeManager.RegisterType(ECS.Entity.Name, {Index=0, Version=0})
+    --ECS.TypeManager.RegisterType(ECS.EntityName, {Index=0, Version=0})
 	self.entityDataManager = ECS.EntityDataManager.new()
 	self.archetypeManager = ECS.ArchetypeManager.new()
 	self.groupManager = ECS.EntityGroupManager.new()
@@ -50,14 +50,14 @@ function EntityManager:CreateArchetype( types )
 end
 
 function EntityManager:Exists( entity )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return false
     end
     return self.entityDataManager:Exists(entity)
 end
 
 function EntityManager:HasComponent( entity, comp_type_name )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return false
     end
 
@@ -65,14 +65,14 @@ function EntityManager:HasComponent( entity, comp_type_name )
 end
 
 function EntityManager:AddComponent( entity, comp_type_name )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return
     end
     self.entityDataManager:AddComponent(entity, comp_type_name, self.archetypeManager,  self.groupManager)
 end
 
 function EntityManager:RemoveComponent( entity, comp_type_name )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return
     end
 
@@ -81,7 +81,7 @@ function EntityManager:RemoveComponent( entity, comp_type_name )
 end
 
 function EntityManager:AddComponentData( entity, componentTypeName, componentData )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return
     end
 	self:AddComponent(entity, componentTypeName)
@@ -89,12 +89,7 @@ function EntityManager:AddComponentData( entity, componentTypeName, componentDat
 end
 
 function EntityManager:SetComponentData( entity, componentTypeName, componentData )
-    ----做检查需要消耗多一倍时间
-    --if not self.entityDataManager:AssertEntityHasComponent(entity, componentTypeName) then
-    --    return
-    --end
-
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return
     end
     self.entityDataManager:SetComponentDataWithTypeName(entity, componentTypeName, componentData)
@@ -105,14 +100,14 @@ function EntityManager:GetComponentData( entity, componentTypeName )
     --    return nil
     --end
 
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return nil
     end
     return self.entityDataManager:GetComponentDataWithTypeName(entity, componentTypeName)
 end
 
 function EntityManager:GetComponentTypes( entity )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return nil
     end
 
@@ -125,7 +120,7 @@ function EntityManager:GetComponentTypes( entity )
 end
 
 function EntityManager:GetComponentCount( entity )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return nil
     end
 
@@ -137,8 +132,39 @@ function EntityManager:CreateComponentGroup( requiredComponents )
     return self.groupManager:CreateEntityGroupByNames(self.archetypeManager, self.entityDataManager, requiredComponents)
 end
 
+
+---添加共享组件数据，注意：将首先检测缓存中的数据，如果有则直接取缓存末位，没有将按 SetSharedComponentData方式
+------@param entity entity对象
+-----@param componentTypeName 组件名字
+-----@param componentData 组件数据
+function EntityManager:AddSharedComponentData( entity, componentTypeName,  componentData)
+    self.entityDataManager:AddSharedComponentData(entity,componentTypeName,componentData)
+end
+
+---设置共享组件数据，注意：底层调用set时将使用deepcopy将数据复制到缓存
+---@param entity entity对象
+---@param componentTypeName 组件名字
+---@param componentData 组件数据
+function EntityManager:SetSharedComponentData(entity, componentTypeName, componentData)
+    self.entityDataManager:SetSharedComponentData(entity,componentTypeName,componentData)
+end
+
+---获取共享组件数据
+---@param entity entity对象
+---@param componentTypeName 组件名字
+function EntityManager:GetSharedComponentData(entity, componentTypeName)
+    return self.entityDataManager:GetSharedComponentData(entity,componentTypeName)
+end
+
+---删除共享组件
+---@param entity entity对象 为nil时会删除整个sharedComponentData,提供则只是删除此entity下的sharedcomponent标记
+---@param componentTypeName 组件名字
+function EntityManager:RemoveSharedComponentData(entity, componentTypeName)
+    self.entityDataManager:RemoveSharedComponentData(entity,componentTypeName)
+end
+
 function EntityManager:DestroyEntity( entity )
-    if entity.IndexInChunk < 0 then
+    if entity < 0 then
         return
     end
     if self.entityDataManager:Exists(entity) then
@@ -153,5 +179,6 @@ end
 function EntityManager:DestroyAllGroup()
     self.groupManager:RemoveAllGroup()
 end
+
 
 return EntityManager

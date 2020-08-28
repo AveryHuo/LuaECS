@@ -29,14 +29,17 @@ function TestSystem:OnUpdate()
     -- 获取数据测试
     local entities = self.group:ToEntityArray()
     local dataGroups = self.group:ToComponentDataArray("DataForTestGetComponentGroup1")
+    if entities.Length == 0 then
+        return
+    end
     local entityData = ECS.World.Active.entityManager:GetComponentData(entities[1], "DataForTestGetComponentGroup1")
-    print(dataGroups.Length)
+    --print(dataGroups.Length)
 
     ECS.World.Active.entityManager:SetComponentData(entities[1], "DataForTestGetComponentGroup1",{x=50})
 
     --ECS.World.Active.entityManager:DestroyEntity(entities[1])
-    print(dataGroups[5].x)
-    print(entityData.x)
+    --print(dataGroups[5].x)
+    --print(entityData.x)
 end
 
 function TestSystem:OnDispose()

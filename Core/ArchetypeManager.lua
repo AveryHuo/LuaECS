@@ -19,7 +19,6 @@ ArchetypeManager.GetTypesStr = GetTypesStr
 -- 生成类型数组
 local GenTypeArray = function( requiredComponents, count )
     local cachedArcheTypes = {}
-    table.insert(cachedArcheTypes,ECS.ComponentType.Create(ECS.Entity.Name))
     for i=1,count do
         table.insert(cachedArcheTypes,ECS.ComponentType.Create(requiredComponents[i]))
     end
@@ -69,9 +68,6 @@ function ArchetypeManager:AllocateIntoChunk( archetype, chunk)
     chunk.EntityCount = chunk.EntityCount + 1 --设置Entity个数
     chunk.Archetype = archetype
     chunk.Archetype.EntityCount = chunk.Archetype.EntityCount + 1
-
-    local allocatedId = chunk.EntityCount -- + os.time()
-    return allocatedId
 end
 
 -- 从archetype中拿一个chunk

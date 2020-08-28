@@ -23,19 +23,16 @@ function ComponentType.FromTypeIndex( typeIndex )
 	type.Name = ct.Name
     type.TypeIndex = typeIndex
     type.AccessModeType = ComponentType.AccessMode.ReadWrite
-    type.BufferCapacity = ct.BufferCapacity
     return type
 end
 
 local is_equal = function ( lhs, rhs )
-	return lhs.TypeIndex == rhs.TypeIndex and lhs.BufferCapacity == rhs.BufferCapacity and lhs.AccessModeType == rhs.AccessModeType
+	return lhs.TypeIndex == rhs.TypeIndex  and lhs.AccessModeType == rhs.AccessModeType
 end
 
 local less_than = function ( lhs, rhs )
 	if lhs.TypeIndex == rhs.TypeIndex then
-        return lhs.BufferCapacity ~= rhs.BufferCapacity
-            and lhs.BufferCapacity < rhs.BufferCapacity
-            or lhs.AccessModeType < rhs.AccessModeType
+        return lhs.AccessModeType < rhs.AccessModeType
     end
     return lhs.TypeIndex < rhs.TypeIndex
 end

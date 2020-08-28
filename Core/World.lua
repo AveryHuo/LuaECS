@@ -46,7 +46,6 @@ function World:DestroySystem( System_name )
 	if not self.systems[System_name] then
 		assert(self.systems[System_name], System_name.." System does not exist in the world")
 	end
-    -- Version = Version + 1
 	self.systems[System_name]:Dispose()
 	self.systems[System_name] = nil
 end

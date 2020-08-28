@@ -30,7 +30,7 @@ function ComponentGroup:CreateComponentDataArray( entities, entityDataManager,  
     end
 
     local set_fun = function ( t, index, value )
-        if t.m_ComponentTypeName == ECS.Entity.Name then
+        if t.m_ComponentTypeName == ECS.EntityName then
             print("Entity type setting is useless!")
             return
         end
@@ -81,7 +81,7 @@ function ComponentGroup:ToEntityArray(  )
         --local node =  match.Archetype.ChunkList.head
         --while node do
         --    if node.value then
-        --        for _,entity in pairs(node.value.Buffer[ECS.Entity.Name]) do
+        --        for _,entity in pairs(node.value.Buffer[ECS.EntityName]) do
         --            table.insert(entities, entity)
         --        end
         --    end
@@ -90,7 +90,7 @@ function ComponentGroup:ToEntityArray(  )
 
 
         for _, v in pairs(match.Archetype.ChunkList:ToValueArray()) do
-            for _,entity in pairs(v.Buffer[ECS.Entity.Name]) do
+            for _,entity in pairs(v.Buffer[ECS.EntityName]) do
                 table.insert(entities, entity)
             end
         end
