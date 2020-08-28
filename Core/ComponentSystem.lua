@@ -2,16 +2,13 @@ local ComponentSystem = class(ECS.BehaviourObject)
 
 function ComponentSystem:Init( world)
     self.m_ComponentGroups = {}
-    self.m_LastSystemVersion = nil
     self.m_EntityManager = nil
     self.m_World = nil
-    self.m_AlwaysUpdateSystem = false
     self.m_PreviouslyEnabled = false
     self.Enabled = true
 
     self.m_World = world
     self.m_EntityManager = world.entityManager
-    self.m_AlwaysUpdateSystem = self.AlwaysUpdateSystem
 
     self.m_ComponentGroups = ECS.ComponentGroup.new()
 end
@@ -26,17 +23,21 @@ function ComponentSystem:Awake( )
 end
 
 function ComponentSystem:Update(  )
-	if self.Enabled and self:ShouldRunSystem() then
+	if self.Enabled then
         if not self.m_PreviouslyEnabled then
             self.m_PreviouslyEnabled = true
-            self:OnStartRunning()
+            if self.OnExecute then
+                self:OnExecute()
+            end
         end
         if self.OnUpdate then
             self:OnUpdate()
         end
     elseif self.m_PreviouslyEnabled then
         self.m_PreviouslyEnabled = false
-        self:OnStopRunning()
+        if self.OnDisable then
+            self:OnDisable()
+        end
     end
 end
 
@@ -46,33 +47,6 @@ function ComponentSystem:Dispose()
         self:OnDispose()
     end
 end
-
-
-function ComponentSystem:ShouldRunSystem(  )
-    if not self.m_World.IsCreated then
-        return false
-    end
-
-    if self.m_AlwaysUpdateSystem then
-        return true
-    end
-    local length = self.m_ComponentGroups and #self.m_ComponentGroups or 0
-    if length == 0 then
-        return true
-    end
-
-    for i=1,length do
-        if not self.m_ComponentGroups[i].IsEmptyIgnoreFilter then
-            return true
-        end
-    end
-
-    return false
-end
-
-function ComponentSystem:OnStartRunning(  )
-end
-
 
 function ComponentSystem:GetComponentGroup( componentTypes )
     for i,v in ipairs(self.m_ComponentGroups) do

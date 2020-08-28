@@ -140,4 +140,5 @@ function EntityGroupManager.CompareComponents( componentTypes, groupData )
     return true
 end
 
+
 return EntityGroupManager

@@ -41,6 +41,13 @@ function TypeManager.RegisterType( name, type_desc )
 	return type_info
 end
 
+function TypeManager:CleanAllTypes()
+	TypeManager.s_Types = {}
+	TypeManager.s_Systems = {}
+	TypeManager.s_Count = 0
+	TypeManager.StaticTypeLookup = {}
+end
+
 CalculateFieldInfo = function ( type_desc )
 	local field_names = {}
 	for k,v in pairs(type_desc) do

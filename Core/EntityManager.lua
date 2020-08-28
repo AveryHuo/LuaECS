@@ -146,5 +146,12 @@ function EntityManager:DestroyEntity( entity )
     end
 end
 
+function EntityManager:DestroyAllData()
+    self.entityDataManager:RemoveEntityData()
+end
+
+function EntityManager:DestroyAllGroup()
+    self.groupManager:RemoveAllGroup()
+end
 
 return EntityManager

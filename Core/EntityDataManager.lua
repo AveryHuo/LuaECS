@@ -8,7 +8,7 @@ local EntityData = {
 }
 -- 此Data类将存储所有的Chunk
 function EntityDataManager:ctor( )
-    self.entityData = self:CreateEntityData()
+    self:CreateEntityData()
     self.GlobalSystemVersion = 1
 
     self.m_ComponentTypeOrderVersion = {}
@@ -44,6 +44,9 @@ end
 
 function EntityDataManager:GetComponentDataWithTypeName( entity, componentTypeName )
     local entityChunk = self.entityData.ChunkData[entity.Id].Chunk
+    if not entityChunk then
+        print("此ID的ENTITY未有chunk：",entity.Id)
+    end
     return entityChunk:GetData(componentTypeName, entity.IndexInChunk)
 end
 
@@ -113,7 +116,6 @@ function EntityDataManager:TryRemoveEntity( entity)
     --将当前的Chunk里的此entity数据删除
     local entityIndex = entity.Id
     local chunk = self.entityData.ChunkData[entityIndex].Chunk
-    self.entityData.ChunkData[entityIndex].Chunk = nil
 
     --Archetype计数变更
     chunk.EntityCount = chunk.EntityCount - 1
@@ -123,6 +125,12 @@ function EntityDataManager:TryRemoveEntity( entity)
 
     --chunk大小设定
     chunk.Archetype:SetChunkSize(chunk, chunk.UsedSize - chunk.Archetype.TotalLength)
+
+    chunk = nil
+
+    self.entityData.ChunkData[entityIndex].Chunk = nil
+
+    print("此ID的ENTITY的Chunk被删除：",entityIndex)
 end
 
 -- 为一个entity重新指定archetype
@@ -171,11 +179,14 @@ function EntityDataManager:AllocateEntity( arch, chunk, allocateIdxInChunk)
 end
 
 function EntityDataManager:CreateEntityData(  )
-    local entities = {}
-    entities.Version   = {}
-    entities.Archetype = {}
-    entities.ChunkData = {}
-    return entities
+    self.entityData = {}
+    self.entityData.Version   = {}
+    self.entityData.Archetype = {}
+    self.entityData.ChunkData = {}
+end
+
+function EntityDataManager:RemoveEntityData(  )
+    self.entityData = {}
 end
 
      

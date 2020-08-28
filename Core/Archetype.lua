@@ -42,7 +42,6 @@ function Archetype:SetChunkSize( chunk, newCount )
     local capacity = chunk.Capacity
 
     if newCount == 0 then  -- 释放Chunk以清空
-        print("chunk recycle")
         self.ChunkPool:Push(chunk)
 
         chunk.Archetype.ChunkCount = chunk.Archetype.ChunkCount - 1

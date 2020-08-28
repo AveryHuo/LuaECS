@@ -1,40 +1,26 @@
 local ECS = ECS or {}
 
-local importer = require("Base.Importer")
-importer.enable()
+require("Base.BaseClass")
 
-importer.require("Base.BaseClass")
-
---让本框架里的文件都有ECS这个全局变量
-local ECSEnv = {
-	ECS = ECS
-}
-setmetatable(ECSEnv, {
-	__index = _ENV,
-	__newindex = function (t,k,v)
-		--本框架内不允许新增和修改全局变量，实在想要的也可以使用_ENV.xx = yy这种形式，但我像是这种没节操的人吗？！
-		error("attempt to set a global value", 2)
-	end,
-})
+_ENV.ECS = ECS
 
 ECS.IdCounter = 0
-ECS.Dispatcher = importer.require("Base.BehaviourDispatch", ECSEnv)
-ECS.BehaviourObject = importer.require("Base.BehaviourObject", ECSEnv)
-ECS.LinkedList = importer.require("Base.LinkedList", ECSEnv)
-ECS.TableUtility = importer.require("Base.TableUtility", ECSEnv)
+ECS.Dispatcher = require("Base.BehaviourDispatch")
+ECS.BehaviourObject = require("Base.BehaviourObject")
+ECS.LinkedList = require("Base.LinkedList")
+ECS.TableUtility = require("Base.TableUtility")
 
-ECS.TypeManager = importer.require("Core.TypeManager", ECSEnv)
-ECS.World = importer.require("Core.World", ECSEnv)
-ECS.Entity = importer.require("Core.Entity", ECSEnv)
-ECS.EntityManager = importer.require("Core.EntityManager", ECSEnv)
-ECS.EntityDataManager = importer.require("Core.EntityDataManager", ECSEnv)
-ECS.ComponentGroup = importer.require("Core.ComponentGroup", ECSEnv)
-ECS.ComponentSystem = importer.require("Core.ComponentSystem", ECSEnv)
-ECS.Archetype = importer.require("Core.Archetype", ECSEnv)
-ECS.ArchetypeManager = importer.require("Core.ArchetypeManager", ECSEnv)
-ECS.EntityGroupManager = importer.require("Core.EntityGroupManager", ECSEnv)
-ECS.ComponentType = importer.require("Core.ComponentType", ECSEnv)
-
+ECS.TypeManager = require("Core.TypeManager")
+ECS.World = require("Core.World")
+ECS.Entity = require("Core.Entity")
+ECS.EntityManager = require("Core.EntityManager")
+ECS.EntityDataManager = require("Core.EntityDataManager")
+ECS.ComponentGroup = require("Core.ComponentGroup")
+ECS.ComponentSystem = require("Core.ComponentSystem")
+ECS.Archetype = require("Core.Archetype")
+ECS.ArchetypeManager = require("Core.ArchetypeManager")
+ECS.EntityGroupManager = require("Core.EntityGroupManager")
+ECS.ComponentType = require("Core.ComponentType")
 
 
 local function InitWorld( worldName )
@@ -45,19 +31,10 @@ end
 
 ECS.InitWorld = InitWorld
 
-
-local rm_func = function(value)
-	if value == 5 then
-		return true
-	end
-	return false
-end
-
 --在这里注册所有System和Data
---importer.require("Logic/MoveSystem", ECSEnv)
---importer.require("Logic/TestSystem", ECSEnv)
+require("Logic/MoveSystem")
+require("Logic/CreateSystem")
+--require("Logic/TestSystem")
 
---为了不影响全局，这里要还原一下package.searchers
-importer.disable()
 
 return ECS

@@ -77,6 +77,18 @@ function ComponentGroup:ToEntityArray(  )
     local match = archetype
     while match ~= nil do
         length = length + match.Archetype.EntityCount
+
+        --local node =  match.Archetype.ChunkList.head
+        --while node do
+        --    if node.value then
+        --        for _,entity in pairs(node.value.Buffer[ECS.Entity.Name]) do
+        --            table.insert(entities, entity)
+        --        end
+        --    end
+        --    node = node.next
+        --end
+
+
         for _, v in pairs(match.Archetype.ChunkList:ToValueArray()) do
             for _,entity in pairs(v.Buffer[ECS.Entity.Name]) do
                 table.insert(entities, entity)
