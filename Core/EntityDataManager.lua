@@ -120,17 +120,21 @@ function EntityDataManager:AddSharedComponentData( entity, componentTypeName,  c
     if compCache and #compCache > 0 then
         self.entityData.SharedData[componentTypeName][entity] = compCache[#compCache]
     else
-        self:SetSharedComponentData(entity,componentTypeName, componentData)
+        if componentData then
+            self:SetSharedComponentData(entity,componentTypeName, componentData)
+        else
+            -- 要存的数据为空，且没有缓存找到，不做任何处理！
+        end
     end
 end
 
----设置共享组件数据，注意：底层调用set时将使用deepcopy将数据复制到缓存
+---设置共享组件数据，注意：如果数据不为空，将使用deepcopy将数据复制到缓存中存储。如果数据为空，则调用Add方法
 ---@param entity entity对象
 ---@param componentTypeName 组件名字
 ---@param componentData 组件数据
 function EntityDataManager:SetSharedComponentData(entity, componentTypeName, componentData)
-    -- 如果共享数据中没有，则创建一个
-    if not self.entityData.SharedData[componentTypeName] then
+    -- 如果componentData不存在 或 共享数据中没有，则创建一个
+    if not componentData or not self.entityData.SharedData[componentTypeName] then
         self:AddSharedComponentData(entity, componentTypeName, componentData)
         return
     end
