@@ -19,7 +19,7 @@ ECS.ComponentGroup = require("Core.ComponentGroup")
 ECS.ComponentSystem = require("Core.ComponentSystem")
 ECS.Archetype = require("Core.Archetype")
 ECS.ArchetypeManager = require("Core.ArchetypeManager")
-ECS.EntityGroupManager = require("Core.EntityGroupManager")
+ECS.ComponentGroupManager = require("Core.ComponentGroupManager")
 ECS.ComponentType = require("Core.ComponentType")
 
 local EntityId = 0
@@ -37,7 +37,7 @@ local function CreateWorld( worldName, setActive)
 	return world
 end
 ECS.CreateWorld = CreateWorld
-
+ECS.World.allWorlds = {}
 
 --在这里注册所有System和Data
 require("Logic/MoveSystem")

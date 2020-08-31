@@ -1,0 +1,104 @@
+-- Tencent is pleased to support the open source community by making xLua available.
+-- Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+-- Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+-- http://opensource.org/licenses/MIT
+-- Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+--C:/Test/TestLuaProfiler/TestLuaProfiler/Assets/XLua/Examples/14_FightTest/
+--package.path = '?.lua;?/?.lua;../?.lua;../../?.lua;Tests/?.lua;'.. package.path;
+local ECS = require "ECS"
+local speed = 10
+local lightCpnt = nil
+
+local r = 0
+ECS.CreateWorld("Default", true)
+
+local moveSys
+local monsterDatas
+function start()
+
+	--组建Data
+	ECS.TypeManager.RegisterType("MoveData", require("Logic.MoveData"))
+	local monsterPrefabData = {}
+	monsterPrefabData.transform = self.transform
+	monsterPrefabData.prefab = monster_prefab
+
+	local heroPrefabData = {}
+	heroPrefabData.transform = self.transform
+	heroPrefabData.prefab = hero_prefab
+
+	ECS.TypeManager.RegisterType("MonsterData", {  })
+	----数据装载到ArcheType
+	local archetype = ECS.World.Active.entityManager:CreateArchetype({"MonsterData","MoveData"})
+
+
+	--print("开始创建实体")
+	--local start_time = os.clock()
+	local entities = ECS.World.Active.entityManager:CreateEntitiesByArcheType(archetype,500)
+	local mid  = #entities / 2
+	for i, v in ipairs(entities) do
+		ECS.World.Active.entityManager:AddSharedComponentData(v, "PrefabData",monsterPrefabData)
+		--if v == mid then
+		--	ECS.World.Active.entityManager:SetSharedComponentData(v, "PrefabData",heroPrefabData)
+		--elseif v < mid then
+		--	ECS.World.Active.entityManager:AddSharedComponentData(v, "PrefabData",monsterPrefabData)
+		--else
+		--	ECS.World.Active.entityManager:AddSharedComponentData(v, "PrefabData",heroPrefabData)
+		--end
+	end
+	--print("创建实体时间:", os.clock() - start_time)
+	--print("->共创建chunk:",ECS.IdCounter)
+
+	----创建 System
+	local createSys = ECS.World.Active:CreateSystem("CreateSystem")
+	createSys:Update()
+	moveSys = ECS.World.Active:CreateSystem("MoveSystem")
+
+	--优化点：一次遍历出来的data存起来，而不是每个update都取。 ToEntityArray  ToComponentDataArray  GetComponentData均有几帧的CPU消耗！！
+	--local monsterd = createSys.group:ToComponentDataArray("MonsterData")
+	--monsterDatas = {}
+	--for i = 1, monsterd.Length do
+	--	table.insert(monsterDatas, monsterd[i])
+	--end
+end
+
+--local border = {}
+--border.leftSide = 2
+--border.rightSide = 8
+--border.frontSize = 32
+--border.backSize = 47
+--local DoRandomMove2 = function(monsterData)
+--	if monsterData.pos_x > border.rightSide then
+--		monsterData.direction_x = 1
+--	elseif monsterData.pos_x < border.leftSide then
+--		monsterData.direction_x = -1
+--	end
+--	monsterData.pos_x = math.abs(monsterData.pos_x) - math.abs(monsterData.pos_x) * math.random(1,10)*0.001 * monsterData.direction_x
+--
+--	if monsterData.pos_z > border.backSize then
+--		monsterData.direction_z = 1
+--	elseif monsterData.pos_z < border.frontSize then
+--		monsterData.direction_z = -1
+--	end
+--	monsterData.pos_z = math.abs(monsterData.pos_z) - math.abs(monsterData.pos_z) * math.random(1,10)*0.001 * monsterData.direction_z
+--	monsterData.pos.x = monsterData.pos_x
+--	monsterData.pos.y = monsterData.pos_y
+--	monsterData.pos.z = monsterData.pos_z
+--	monsterData.monster.transform.position = monsterData.pos
+--end
+
+function update()
+	ECS.Dispatcher:Update()
+	--moveSys:Update()
+
+	--for i = 1, #monsterDatas do
+	--	DoRandomMove2(monsterDatas[i])
+	--end
+end
+
+
+function ondestroy()
+    print("lua destroy")
+end
+
+

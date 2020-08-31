@@ -11,11 +11,12 @@ function CreateSystem:OnExecute()
     local entities = self.group:ToEntityArray()
     local start_time = os.clock()
     local lastTime = 0
+
     for i = 1, entities.Length do
         local prefabData = ECS.World.Active.entityManager:GetSharedComponentData(entities[i], "PrefabData")
         local monsterData = ECS.World.Active.entityManager:GetComponentData(entities[i], "MonsterData")
         local newMonster = CS.UnityEngine.GameObject.Instantiate(prefabData.prefab,prefabData.transform)
-        --local newMonster = CS.UnityEngine.GameObject.Instantiate(monsterData.monster_prefab,monsterData.transform)
+        --local newMonster = CS.UnityEngine.GameObject.Instantiate(monsterData.prefab,monsterData.transform)
         local randPosx = math.random(2,8)
         local posY = 14.2
         local randPosZ = math.random(32,47)

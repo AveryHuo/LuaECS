@@ -1,11 +1,19 @@
+---@class ComponentGroup 存储在componentsystem下的component组对象
 local ComponentGroup = class()
-ECS.ComponentGroup = ComponentGroup
 
+---构造函数
+---@param groupData 由group管理器生成好的数据
+---@param entityDataManager 实体数据管理器
 function ComponentGroup:ctor( groupData, entityDataManager )
 	self.groupData = groupData
     self.entityDataManager = entityDataManager
 end
 
+---由entity数据找到ComponentData数据数组，使用元函数迭代器
+---@param entities 所有的entity数据
+---@param　entityDataManager 实体数据管理器
+---@param 指定组件名字
+---@return ComponentData数据数组
 function ComponentGroup:CreateComponentDataArray( entities, entityDataManager,  componentName )
     assert(componentName~=nil, "componentName should not be nil!")
     -- CachedBeginIndex，CachedEndIndex 分别记录当前Chunk的起始和结尾索引
@@ -51,20 +59,17 @@ function ComponentGroup:CreateComponentDataArray( entities, entityDataManager,  
     return array
 end
 
-function ComponentGroup:ToComponentDataArray( com_type )
+---从group中获取某个component的数据
+---@param component的名字
+---@return component数据数组对象，由索引器取值
+function ComponentGroup:ToComponentDataArray( componentName )
     local entities = self:ToEntityArray()
-    local data = self:CreateComponentDataArray(entities, self.entityDataManager , com_type)
+    local data = self:CreateComponentDataArray(entities, self.entityDataManager , componentName)
     return data
 end
 
-function ComponentGroup:GetIndexInComponentGroup( componentType )
-    local componentIndex = 1
-    while componentIndex <= self.groupData.RequiredComponentsCount and self.groupData.RequiredComponents[componentIndex].TypeIndex ~= componentType do
-        componentIndex = componentIndex + 1
-    end
-    return componentIndex
-end
-
+---返回当前group下的关联的所有entity
+---@return Entity数组
 function ComponentGroup:ToEntityArray(  )
     local archetype = self.groupData.FirstMatchingArchetype
     if not archetype then
@@ -77,18 +82,6 @@ function ComponentGroup:ToEntityArray(  )
     local match = archetype
     while match ~= nil do
         length = length + match.Archetype.EntityCount
-
-        --local node =  match.Archetype.ChunkList.head
-        --while node do
-        --    if node.value then
-        --        for _,entity in pairs(node.value.Buffer[ECS.EntityName]) do
-        --            table.insert(entities, entity)
-        --        end
-        --    end
-        --    node = node.next
-        --end
-
-
         for _, v in pairs(match.Archetype.ChunkList:ToValueArray()) do
             for _,entity in pairs(v.Buffer[ECS.EntityName]) do
                 table.insert(entities, entity)
@@ -102,12 +95,14 @@ function ComponentGroup:ToEntityArray(  )
     return entities
 end
 
-
-function ComponentGroup:CompareComponents( componentTypes )
-    return ECS.EntityGroupManager.CompareComponents(componentTypes, self.groupData)
+---判断group中是否包含指定的type名字数组
+---@return true包含
+function ComponentGroup:CompareComponents( componentTypeNames )
+    return ECS.ComponentGroupManager.CompareComponents(componentTypeNames, self.groupData)
 end
 
--- 计算所有Component个数
+---计算所有Component个数
+---@return 所有entity个数
 function ComponentGroup:GetEntityCount()
     local archetype = self.groupData.FirstMatchingArchetype
     if not archetype then

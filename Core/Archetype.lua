@@ -1,6 +1,8 @@
+---@class Archetype component类型的集合容器
 local Archetype = class()
 
-function Archetype:ctor(types, count, groupManager)
+---Archetype构造方法，提供类型table及个数
+function Archetype:ctor(types, count)
     self.TypesCount = count
     self.Types = types
     self.EntityCount = 0
@@ -8,7 +10,7 @@ function Archetype:ctor(types, count, groupManager)
 
     self.TypesMap = {}
     self.TotalLength = 0
-    for k,v in pairs(types) do
+    for _,v in pairs(types) do
         local typeName = ECS.TypeManager.GetTypeNameByIndex(v.TypeIndex)
         local typeInfo = ECS.TypeManager.GetTypeInfoByIndex(v.TypeIndex)
         self.TypesMap[typeName] = true
@@ -20,6 +22,8 @@ function Archetype:ctor(types, count, groupManager)
     self.ChunkPool = ECS.LinkedList()
 end
 
+---获取对应typeindex的类型在types中的索引
+---@return 指定typeindex的索引位置
 function Archetype:GetIndexInTypeArray( typeIndex )
     local types = self.Types
     local typeCount = self.TypesCount
@@ -31,13 +35,17 @@ function Archetype:GetIndexInTypeArray( typeIndex )
     return -1
 end
 
+---判断类型名是否在此archetype对象
+---@return true存在
 function Archetype:IsTypeNameInArchetype(  typeName )
     local result = self and self.TypesMap and self.TypesMap[typeName]
     return result ~= nil
 end
 
 
--- 增加chunk里存储大小，并做判断是否新建一个新的chunk
+---增加chunk里存储大小，并做判断是否新建一个新的chunk
+---@param chunk 对应的chunk对象
+---@param newCount 最新的chunk大小
 function Archetype:SetChunkSize( chunk, newCount )
     local capacity = chunk.Capacity
 
@@ -58,7 +66,8 @@ function Archetype:SetChunkSize( chunk, newCount )
     end
 end
 
--- 创建一个Chunk
+---创建一个Chunk
+---@return 生成的一个新的chunk对象
 function Archetype:CreateNewChunk()
     -- 初始化chunk，设置大小，指向，链表指针等信息
     local newChunk = {
@@ -109,6 +118,8 @@ function Archetype:CreateNewChunk()
     return newChunk
 end
 
+---构建chunk的信息
+---@param chunk对象
 function Archetype:ConstructChunk( chunk )
     chunk.Archetype = self
 
@@ -126,6 +137,8 @@ function Archetype:ConstructChunk( chunk )
     self.ChunkCount = self.ChunkCount+1
 end
 
+---从archetype中获取一个chunk，默认取最后一位，取不到则直接新建
+---@return chunk对象
 function Archetype:GetChunkFromArchetype(  )
     -- 尝试从池子拿一个chunk块
     local newChunk = self.ChunkPool:Pop()

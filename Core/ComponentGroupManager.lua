@@ -1,10 +1,15 @@
-local EntityGroupManager = class()
-ECS.EntityGroupManager = EntityGroupManager
+---@class ComponentGroupManager componentgroup管理器
+local ComponentGroupManager = class()
 
-function EntityGroupManager:ctor()
-end
-
-function EntityGroupManager:CreateEntityGroup( typeMan, entityDataManager, archetypeQueries, archetypeFiltersCount, requiredComponents, requiredComponentsCount )
+---创建一个componentgroup
+---@param typeMan ArchetypeManager
+---@param entityDataManager EntityDataManager
+---@param archetypeQueries 查询出的typeindex数组
+---@param archetypeFiltersCount typeindex数组长度
+---@param requiredComponents 组件名字列表
+---@param requiredComponentsCount 组件个数
+---@return ComponentGroup 对象
+function ComponentGroupManager:CreateComponentGroup( typeMan, entityDataManager, archetypeQueries, archetypeFiltersCount, requiredComponents, requiredComponentsCount )
 	local grp = {}
     grp.PrevGroup = self.lastGroupData
     grp.RequiredComponentsCount = requiredComponentsCount
@@ -24,13 +29,20 @@ function EntityGroupManager:CreateEntityGroup( typeMan, entityDataManager, arche
     return ECS.ComponentGroup.new(grp, entityDataManager)
 end
 
-function EntityGroupManager:CreateEntityGroupByNames( typeMan, entityDataManager, requiredComponents )
+---通过组件名字创建componentgroup
+---@param typeMan ArchetypeManager
+---@param entityDataManager EntityDataManager
+---@param requiredComponents 组件名字列表
+---@return ComponentGroup 对象
+function ComponentGroupManager:CreateComponentGroupByNames( typeMan, entityDataManager, requiredComponents )
 	local requiredComponentPtr, requiredComponentCount = ECS.ArchetypeManager.GenTypeArray(requiredComponents, #requiredComponents)
-    return self:CreateEntityGroup(typeMan, entityDataManager, self:CreateQuery(requiredComponents),1, requiredComponentPtr, requiredComponentCount)
+    return self:CreateComponentGroup(typeMan, entityDataManager, self:CreateQuery(requiredComponents),1, requiredComponentPtr, requiredComponentCount)
 end
 
--- 创建组件ID列表
-function EntityGroupManager:CreateQuery( comp_names )
+---创建组件ID列表
+---@param requiredComponents 组件名字列表
+---@return 查询出的typeindex数组
+function ComponentGroupManager:CreateQuery( comp_names )
 	local requiredTypes = {}
     for i=1,#comp_names do
         ECS.TableUtility.InsertSorted(requiredTypes, i, ECS.ComponentType.Create(comp_names[i]))
@@ -61,8 +73,9 @@ function EntityGroupManager:CreateQuery( comp_names )
     return filter
 end
 
--- 查找所有Group（链表遍历），为所有匹配上的group.FirstMatchingArchetype赋值Type
-function EntityGroupManager:AddArchetypeIfMatching( type )
+---查找所有Group（链表遍历），为所有匹配上的group.FirstMatchingArchetype赋值Type
+---@param type Archetype
+function ComponentGroupManager:AddArchetypeIfMatching( type )
 	local grp = self.lastGroupData
 	while grp ~= nil do 
 		self:AddArchetypeIfMatchingWithGroup(type, grp)
@@ -70,8 +83,10 @@ function EntityGroupManager:AddArchetypeIfMatching( type )
 	end
 end
 
---针对grp生成一遍 名为match的Archetype对象
-function EntityGroupManager:AddArchetypeIfMatchingWithGroup( archetype, group )
+---针对grp生成一遍 名为match的Archetype对象
+---@param archetype Archetype
+---@param group ComponentGroup
+function ComponentGroupManager:AddArchetypeIfMatchingWithGroup( archetype, group )
 	if not self:IsMatchingArchetypeByGroupData(archetype, group) then
         return
     end
@@ -96,8 +111,10 @@ function EntityGroupManager:AddArchetypeIfMatchingWithGroup( archetype, group )
     end
 end
 
--- 比较当前Group的archetype与指定archetype是否匹配
-function EntityGroupManager:IsMatchingArchetypeByGroupData( archetype, group )
+---比较当前Group的archetype与指定archetype是否匹配
+---@param archetype Archetype
+---@param group ComponentGroup
+function ComponentGroupManager:IsMatchingArchetypeByGroupData( archetype, group )
 	for i=1,group.ArchetypeQueryCount do
         if self:IsMatchingArchetypeByQuery(archetype, group.ArchetypeQuery[i]) then
             return true
@@ -106,8 +123,10 @@ function EntityGroupManager:IsMatchingArchetypeByGroupData( archetype, group )
     return false
 end
 
--- 比较当前Group的archetype是否与某个查询集匹配
-function EntityGroupManager:IsMatchingArchetypeByQuery( archetype, query )
+---比较当前Group的archetype是否与某个查询集匹配
+---@param archetype Archetype
+---@param query typeindex数组
+function ComponentGroupManager:IsMatchingArchetypeByQuery( archetype, query )
     local componentTypes = archetype.Types
     local componentTypesCount = archetype.TypesCount
     local foundCount = 0
@@ -123,17 +142,20 @@ function EntityGroupManager:IsMatchingArchetypeByQuery( archetype, query )
     return foundCount == query.AllCount
 end
 
--- 比较组件数据是否相同
-function EntityGroupManager.CompareComponents( componentTypes, groupData )
+---比较组件数据是否相同
+---@param componentTypeNames type名字数组
+---@param groupData 对应的ComponentGroup的data
+---@return true表示type数组均包含在group中
+function ComponentGroupManager.CompareComponents( componentTypeNames, groupData )
 	if groupData.RequiredComponents == nil then
         return false
     end
     -- ComponentGroups are constructed including the Entity ID
-    if #componentTypes + 1 ~= groupData.RequiredComponentsCount then
+    if #componentTypeNames + 1 ~= groupData.RequiredComponentsCount then
         return false
     end
-    for i=1,#componentTypes do
-        if groupData.RequiredComponents[i + 1] ~= ECS.ComponentType.Create(componentTypes[i]) then
+    for i=1,#componentTypeNames do
+        if groupData.RequiredComponents[i + 1] ~= ECS.ComponentType.Create(componentTypeNames[i]) then
             return false
         end
     end
@@ -141,4 +163,4 @@ function EntityGroupManager.CompareComponents( componentTypes, groupData )
 end
 
 
-return EntityGroupManager
+return ComponentGroupManager

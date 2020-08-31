@@ -1,11 +1,7 @@
+---@class EntityDataManager EntityData管理器
 local EntityDataManager = class()
-ECS.EntityDataManager = EntityDataManager
 
-local EntityData = {
-	Archetype = nil,
-	Chunk = nil
-}
--- 此Data类将存储所有的Chunk
+---构造函数：此Data类将存储所有的Chunk
 function EntityDataManager:ctor( )
     self:CreateEntityData()
     self.GlobalSystemVersion = 1
@@ -13,6 +9,10 @@ function EntityDataManager:ctor( )
     self.m_ComponentTypeOrderVersion = {}
 end
 
+---判断指定的type name是否在entity中
+---@param entity Entity对象
+---@param comp_type_name type名字
+---@return true则entity中包含此component
 function EntityDataManager:HasComponent( entity, comp_type_name, ignoreExistCheck )
 	if not ignoreExistCheck and not self:Exists(entity) then 
 		return false
@@ -21,11 +21,18 @@ function EntityDataManager:HasComponent( entity, comp_type_name, ignoreExistChec
     return archetype:IsTypeNameInArchetype(comp_type_name)
 end
 
+---判断是否存在此entity。是否有此entity的chunk数据
+---@param entity Entity对象
+---@return true则包含此entity数据
 function EntityDataManager:Exists( entity )
     local hasChunk = self.entityData.ChunkData[entity] and self.entityData.ChunkData[entity].Chunk ~= nil
     return hasChunk
 end
 
+---判断Entity是否存在 并 判断指定的type name是否在entity中，
+---@param entity Entity对象
+---@param comp_type_name type名字
+---@return true则entity中包含此component
 function EntityDataManager:AssertEntityHasComponent( entity, com_type_name )
     if not self:Exists(entity) then
         print("Error the Entity does not exist")
@@ -39,8 +46,11 @@ function EntityDataManager:AssertEntityHasComponent( entity, com_type_name )
     return true
 end
 
-
-
+---创建指定个数的实体
+---@param archetypeManager ArchetypeManager
+---@param archetype Archetype
+---@param count 个数
+---@return Entity集
 function EntityDataManager:CreateEntities( archetypeManager, archetype, count )
     local entities = {}
     local chunk = {}
@@ -57,11 +67,18 @@ function EntityDataManager:CreateEntities( archetypeManager, archetype, count )
     return entities
 end
 
+---通过entity获取Archetype
+---@param entity Entity对象
+---@return Archetype
 function EntityDataManager:GetArchetype( entity )
     return self.entityData.Archetype[entity]
 end
 
-
+---添加一个component到entity
+---@param entity Entity对象
+---@param comp_type_name type名字
+---@param archetypeManager ArchetypeManager
+---@param groupManager ComponentGroupManager
 function EntityDataManager:AddComponent( entity, comp_type_name, archetypeManager, groupManager )
     local componentType = ECS.ComponentType.Create(comp_type_name)
 	local archetype = self:GetArchetype(entity)
@@ -75,6 +92,11 @@ function EntityDataManager:AddComponent( entity, comp_type_name, archetypeManage
     self:SetArchetype(archetypeManager, entity, newType)
 end
 
+---从entity中删除一个component
+---@param entity Entity对象
+---@param comp_type_name type名字
+---@param archetypeManager ArchetypeManager
+---@param groupManager ComponentGroupManager
 function EntityDataManager:RemoveComponent( entity, comp_type_name, archetypeManager, groupManager )
     local componentType = ECS.ComponentType.Create(comp_type_name)
     local archetype = self:GetArchetype(entity)
@@ -95,12 +117,18 @@ function EntityDataManager:RemoveComponent( entity, comp_type_name, archetypeMan
     self:SetArchetype(archetypeManager, entity, newType)
 end
 
-
+---获取entity下的一个component数据
+---@param entity entity对象
+---@param componentTypeName 组件名字
 function EntityDataManager:GetComponentDataWithTypeName( entity, componentTypeName )
     local entityChunk = self.entityData.ChunkData[entity].Chunk
     return entityChunk:GetData(componentTypeName, entity)
 end
 
+---设置entity下的Component数据
+---@param entity entity对象
+---@param componentTypeName 组件名字
+---@param componentData 组件数据
 function EntityDataManager:SetComponentDataWithTypeName( entity, componentTypeName, componentData )
     local entityChunk = self.entityData.ChunkData[entity].Chunk
     entityChunk:SetData(componentTypeName, entity, componentData)
@@ -175,10 +203,15 @@ function EntityDataManager:RemoveSharedComponentData(entity, componentTypeName)
     end
 end
 
+---获取entity的chunk
+---@param entity Entity对象
+---@return chunk chunk对象
 function EntityDataManager:GetComponentChunk( entity )
     return self.entityData.ChunkData[entity].Chunk
 end
 
+---删除一个entity
+---@param entity Entity对象
 function EntityDataManager:TryRemoveEntity( entity)
     --将当前的Chunk里的此entity数据删除
     local chunk = self.entityData.ChunkData[entity].Chunk
@@ -197,7 +230,10 @@ function EntityDataManager:TryRemoveEntity( entity)
     self.entityData.ChunkData[entity].Chunk = nil
 end
 
--- 为一个entity重新指定archetype
+---为一个entity重新指定archetype
+---@param typeMan ArchetypeManager
+---@param entity Entity对象
+---@param archetype Archetype
 function EntityDataManager:SetArchetype( typeMan, entity, archetype )
     local oldArchetype = self.entityData.Archetype[entity]
 
@@ -226,6 +262,10 @@ function EntityDataManager:SetArchetype( typeMan, entity, archetype )
     oldArchetype:SetChunkSize(oldChunk, oldChunk.UsedSize - oldArchetype.TotalLength)
 end
 
+---分配一个Entity到对应的chunk下，同时设置此entity的archetype和chunk
+---@param arch Archetype
+---@param chunk Chunk对象
+---@return entity对象
 function EntityDataManager:AllocateEntity( arch, chunk)
     local outputEntity = ECS.NewEntity()
 
@@ -239,6 +279,7 @@ function EntityDataManager:AllocateEntity( arch, chunk)
     return outputEntity
 end
 
+---创建当前的EntityData全局数据
 function EntityDataManager:CreateEntityData(  )
     self.entityData = {}
     self.entityData.Archetype = {}
@@ -247,6 +288,7 @@ function EntityDataManager:CreateEntityData(  )
     self.entityData.SharedCache = {}
 end
 
+---移除所有全局EntityData数据
 function EntityDataManager:RemoveEntityData(  )
     self.entityData = {}
 end

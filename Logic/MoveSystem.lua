@@ -28,9 +28,9 @@ function MoveSystem:OnExecute()
 end
 
 function MoveSystem:OnUpdate()
-    --for i = 1, #self.monsterDatas do
-    --    self:DoRandomMove(self.monsterDatas[i], self.moveDatas[i])
-    --end
+    for i = 1, #self.monsterDatas do
+        self:DoRandomMove(self.monsterDatas[i], self.moveDatas[i])
+    end
 
     --for i = 1, #self.Entities do
     --    local monsterData = ECS.World.Active.entityManager:GetComponentData(self.Entities[i],"MonsterData")
@@ -42,14 +42,14 @@ function MoveSystem:OnUpdate()
     --    table.remove(self.Entities,1);
     --end
 
-    if #self.Entities > 0 then
-        ECS.World.Active.entityManager:RemoveComponent(self.Entities[1],"MonsterData")
-        ECS.World.Active.entityManager:RemoveComponent(self.Entities[1],"MoveData")
-        table.remove(self.Entities,1);
-
-        local datas =  self.group:ToComponentDataArray("MonsterData")
-        print("monsterdata剩下：",datas.Length)
-    end
+    --if #self.Entities > 0 then
+    --    ECS.World.Active.entityManager:RemoveComponent(self.Entities[1],"MonsterData")
+    --    ECS.World.Active.entityManager:RemoveComponent(self.Entities[1],"MoveData")
+    --    table.remove(self.Entities,1);
+    --
+    --    local datas =  self.group:ToComponentDataArray("MonsterData")
+    --    print("monsterdata剩下：",datas.Length)
+    --end
 
 end
 function MoveSystem:DoRandomMove(monsterData,moveData)
