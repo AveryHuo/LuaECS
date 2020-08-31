@@ -1,3 +1,4 @@
+---@class Node 链表结点
 local Node = {}
 
 function Node:New(value)
@@ -11,16 +12,21 @@ function Node:New(value)
     return new_node
 end
 
-local LinkedList = {}
+---@class LinkedList 链表
+local LinkedList = class()
 
-
-function LinkedList:New()
-    local new_linked_list = {head=nil, tail=nil}
-    setmetatable(new_linked_list, self)
-    self.__index = self
-    return new_linked_list
+---新建一个LinkedList
+function LinkedList:ctor()
+    --local new_linked_list = {head=nil, tail=nil}
+    --setmetatable(new_linked_list, self)
+    --self.__index = self
+    --return new_linked_list
+    self.head = nil
+    self.tail = nil
 end
 
+---向链表尾部添加一个结点
+---@param value 新结点的值
 function LinkedList:Push(value)
     local node = Node:New(value)
     if self.tail then
@@ -33,6 +39,8 @@ function LinkedList:Push(value)
     self.tail = node
 end
 
+---弹出链表最后一位
+---@return 最后一位结点的值
 function LinkedList:Pop()
     local value = nil
 
@@ -52,6 +60,8 @@ function LinkedList:Pop()
     return value
 end
 
+---获取链表头的值
+---@return 链表头的值
 function LinkedList:GetFirst()
     if self.head then
         return self.head.value
@@ -60,6 +70,8 @@ function LinkedList:GetFirst()
     end
 end
 
+---获取链表尾的值
+---@return 链表尾的值
 function LinkedList:GetLast()
     if self.tail then
         return self.tail.value
@@ -68,6 +80,8 @@ function LinkedList:GetLast()
     end
 end
 
+---判断链表是否为空
+---@return 链表是否为空
 function LinkedList:IsEmpty()
     if self.head or self.tail then
         return false
@@ -75,6 +89,8 @@ function LinkedList:IsEmpty()
     return true
 end
 
+---获取链表的个数
+---@return 链表结点数
 function LinkedList:Count()
     local node = self.head
     local count = 0
@@ -85,6 +101,7 @@ function LinkedList:Count()
     return count
 end
 
+---向头部插入值
 function LinkedList:InsertToHead(value)
     local node = Node:New(value)
     if self.head then
@@ -97,6 +114,7 @@ function LinkedList:InsertToHead(value)
     self.head = node
 end
 
+---弹出链表头部
 function LinkedList:PopHead()
     local value = nil
     if self.head then
@@ -111,6 +129,7 @@ function LinkedList:PopHead()
     return value
 end
 
+---删除链表中某一个值为value的结点
 function LinkedList:Delete(value)
     local node = self.head
     while node do
@@ -137,6 +156,7 @@ function LinkedList:Delete(value)
     end
 end
 
+---返回链表所有的结点值
 function LinkedList:ToValueArray()
     local ret = {}
 
@@ -148,6 +168,7 @@ function LinkedList:ToValueArray()
     return ret
 end
 
+---输出结点所有的值
 function LinkedList:Print()
     local node = self.head
     while node do
@@ -156,9 +177,8 @@ function LinkedList:Print()
         end
         node = node.next
     end
-
 end
 
 return function()
-    return LinkedList:New()
+    return LinkedList.new()
 end

@@ -33,6 +33,7 @@ local function CreateWorld( worldName, setActive)
 	local world = ECS.World.new(worldName)
 	if setActive then
 		ECS.World.Active = world
+		ECS.EntityManager.Active = world.entityManager
 	end
 	return world
 end

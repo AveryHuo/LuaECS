@@ -1,6 +1,7 @@
 ---@class EntityManager 直属于World的全局ECS控制器
 local EntityManager = class(ECS.BehaviourObject)
-
+---@field EntityManager
+EntityManager.Active = nil
 ---BehaviourObject 在构造时调用
 function EntityManager:Init(World)
     self.world = World

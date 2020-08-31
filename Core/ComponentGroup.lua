@@ -5,6 +5,7 @@ local ComponentGroup = class()
 ---@param groupData 由group管理器生成好的数据
 ---@param entityDataManager 实体数据管理器
 function ComponentGroup:ctor( groupData, entityDataManager )
+    ---@field groupData table
 	self.groupData = groupData
     self.entityDataManager = entityDataManager
 end

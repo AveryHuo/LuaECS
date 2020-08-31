@@ -32,12 +32,12 @@ function TestSystem:OnUpdate()
     if entities.Length == 0 then
         return
     end
-    local entityData = ECS.World.Active.entityManager:GetComponentData(entities[1], "DataForTestGetComponentGroup1")
+    local entityData = ECS.EntityManager.Active:GetComponentData(entities[1], "DataForTestGetComponentGroup1")
     --print(dataGroups.Length)
 
-    ECS.World.Active.entityManager:SetComponentData(entities[1], "DataForTestGetComponentGroup1",{x=50})
+    ECS.EntityManager.Active:SetComponentData(entities[1], "DataForTestGetComponentGroup1",{x=50})
 
-    --ECS.World.Active.entityManager:DestroyEntity(entities[1])
+    --ECS.EntityManager.Active:DestroyEntity(entities[1])
     --print(dataGroups[5].x)
     --print(entityData.x)
 end

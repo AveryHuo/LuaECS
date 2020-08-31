@@ -1,6 +1,7 @@
 ---@class World ECS-组件，World于ECS上层的容器
 local World = class()
-
+---@field World
+World.Active = nil
 ---构造函数，创建管理器，并添加到全局列表
 ---@param name world名字
 function World:ctor( name )

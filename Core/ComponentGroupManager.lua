@@ -1,6 +1,13 @@
 ---@class ComponentGroupManager componentgroup管理器
 local ComponentGroupManager = class()
 
+---构造函数
+function ComponentGroupManager:ctor()
+    ---@field groupList LinkedList
+    self.groupList = ECS.LinkedList()
+
+end
+
 ---创建一个componentgroup
 ---@param typeMan ArchetypeManager
 ---@param entityDataManager EntityDataManager
@@ -11,7 +18,6 @@ local ComponentGroupManager = class()
 ---@return ComponentGroup 对象
 function ComponentGroupManager:CreateComponentGroup( typeMan, entityDataManager, archetypeQueries, archetypeFiltersCount, requiredComponents, requiredComponentsCount )
 	local grp = {}
-    grp.PrevGroup = self.lastGroupData
     grp.RequiredComponentsCount = requiredComponentsCount
     grp.RequiredComponents = requiredComponents
 
@@ -19,13 +25,14 @@ function ComponentGroupManager:CreateComponentGroup( typeMan, entityDataManager,
     table.insert(grp.ArchetypeQuery, archetypeQueries)
     grp.ArchetypeQueryCount = archetypeFiltersCount
     grp.FirstMatchingArchetype = nil
-    grp.LastMatchingArchetype = nil
-    local type = typeMan.lastArcheType
-    while type ~= nil do
-        self:AddArchetypeIfMatchingWithGroup(type, grp)
-        type = type.PrevArchetype
+
+    --为所有的类型找是否有合适的group对应
+    for _, v in pairs(typeMan.archeTypes) do
+        self:AddArchetypeIfMatchingWithGroup(v, grp)
     end
-    self.lastGroupData = grp
+
+    self.groupList:Push(grp)
+
     return ECS.ComponentGroup.new(grp, entityDataManager)
 end
 
@@ -76,11 +83,9 @@ end
 ---查找所有Group（链表遍历），为所有匹配上的group.FirstMatchingArchetype赋值Type
 ---@param type Archetype
 function ComponentGroupManager:AddArchetypeIfMatching( type )
-	local grp = self.lastGroupData
-	while grp ~= nil do 
-		self:AddArchetypeIfMatchingWithGroup(type, grp)
-		grp = grp.PrevGroup
-	end
+    for _, v in pairs(self.groupList:ToValueArray()) do
+        self:AddArchetypeIfMatchingWithGroup(type, v)
+    end
 end
 
 ---针对grp生成一遍 名为match的Archetype对象
@@ -94,9 +99,6 @@ function ComponentGroupManager:AddArchetypeIfMatchingWithGroup( archetype, group
     local match = {}
     match.Archetype = archetype
     match.IndexInArchetype = {}
-    if (group.LastMatchingArchetype == nil) then
-        group.LastMatchingArchetype = match
-    end
 
     match.Next = group.FirstMatchingArchetype
     group.FirstMatchingArchetype = match

@@ -25,6 +25,8 @@ function MoveSystem:OnExecute()
     for i = 1, moved.Length do
         table.insert(self.moveDatas, moved[i])
     end
+
+    ECS.World.Active:DestroySystem("CreateSystem")
 end
 
 function MoveSystem:OnUpdate()
@@ -33,18 +35,18 @@ function MoveSystem:OnUpdate()
     end
 
     --for i = 1, #self.Entities do
-    --    local monsterData = ECS.World.Active.entityManager:GetComponentData(self.Entities[i],"MonsterData")
-    --    local moveData = ECS.World.Active.entityManager:GetComponentData(self.Entities[i],"MoveData")
+    --    local monsterData = ECS.EntityManager.Active:GetComponentData(self.Entities[i],"MonsterData")
+    --    local moveData = ECS.EntityManager.Active:GetComponentData(self.Entities[i],"MoveData")
     --    self:DoRandomMove(monsterData, moveData)
     --end
     --if #self.Entities > 0 then
-    --    ECS.World.Active.entityManager:DestroyEntity(self.Entities[1])
+    --    ECS.EntityManager.Active:DestroyEntity(self.Entities[1])
     --    table.remove(self.Entities,1);
     --end
 
     --if #self.Entities > 0 then
-    --    ECS.World.Active.entityManager:RemoveComponent(self.Entities[1],"MonsterData")
-    --    ECS.World.Active.entityManager:RemoveComponent(self.Entities[1],"MoveData")
+    --    ECS.EntityManager.Active:RemoveComponent(self.Entities[1],"MonsterData")
+    --    ECS.EntityManager.Active:RemoveComponent(self.Entities[1],"MoveData")
     --    table.remove(self.Entities,1);
     --
     --    local datas =  self.group:ToComponentDataArray("MonsterData")

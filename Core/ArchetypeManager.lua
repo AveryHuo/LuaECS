@@ -58,10 +58,6 @@ end
 function ArchetypeManager:CreateArchetypeInternal( types, count, groupManager )
     local type = ECS.Archetype.new(types, count, groupManager)
 
-    -- 找到前面的archetype关联
-    type.PrevArchetype = self.lastArcheType
-    self.lastArcheType = type
-
     -- types以":"分隔为KEY，添加此archetype
     local type_str = ArchetypeManager.GetTypesStr(types, count)
     self.archeTypes[type_str] = type

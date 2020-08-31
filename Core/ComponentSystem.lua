@@ -12,8 +12,6 @@ function ComponentSystem:Init( world)
 
     self.m_World = world
     self.m_EntityManager = world.entityManager
-
-    self.m_ComponentGroups = ECS.ComponentGroup.new()
 end
 
 ---固定的生命周期：创建一个system将自动调用。
@@ -53,6 +51,11 @@ end
 ---可在自定义的system中加入OnDispose来执行自定义功能
 function ComponentSystem:Dispose()
     ECS.Dispatcher:UnRegister(self)
+    for i, v in pairs(self.m_ComponentGroups) do
+        v.groupData = nil
+        v = nil
+    end
+    self.m_ComponentGroups = {}
     if self.OnDispose then
         self:OnDispose()
     end
